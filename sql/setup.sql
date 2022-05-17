@@ -14,13 +14,13 @@ create table Tiers (
 drop table Tournaments;
 create table Tournaments (
     tourneyid       serial primary key,
-    type            int not null,
+    type            int,
     name            text,
     url             text,
     numentrants     int,
     uniqueplacings  int,
     bracketreset    boolean,
-    tier            int not null,
+    tier            int,
     foreign key (type) references TourneyTypes(typeid),
     foreign key (tier) references Tiers(tierid)
 );
@@ -35,7 +35,7 @@ drop table Attendees;
 create table Attendees (
     attendeeid  serial primary key,
     tourney     int not null,
-    player      int not null,
+    player      int,
     name        text,
     standing    int,
     foreign key (tourney) references Tournaments(tourneyid),
