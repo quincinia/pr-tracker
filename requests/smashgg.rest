@@ -1,0 +1,49 @@
+### https://smash.gg/tournament/shinto-series-smash-1/event/singles-1v1
+POST https://api.smash.gg/gql/alpha
+content-type: application/json
+authorization: Bearer {{$dotenv SMASHGG_KEY}}
+X-REQUEST-TYPE: GraphQL
+
+query TournamentQuery($slug: String) {
+    tournament(slug: $slug) {
+        id
+        name
+        url(relative: false)
+        events {
+            name
+            state
+            phases(state: COMPLETED) {
+                bracketType
+            }
+            sets(page: 1, perPage: 3, sortType: RECENT) {
+                nodes {
+                    fullRoundText
+                    lPlacement
+                }
+            }
+            numEntrants
+            standings(query: { page: 1, perPage: 500 }) {
+                nodes {
+                    standing
+                    entrant {
+                        name
+                    }
+                }
+            }
+        }
+    }
+}
+
+{
+    "slug": "shinto-series-smash-1"
+}
+
+### Normal query
+POST https://api.smash.gg/gql/alpha
+content-type: application/json
+authorization: Bearer {{$dotenv SMASHGG_KEY}}
+
+{
+  "query": "query TournamentQuery($slug: String) {  tournament(slug: $slug) { id name url(relative: false) events { name  state phases(state: COMPLETED) { bracketType } sets(page: 1,perPage: 3, sortType: RECENT) { nodes { fullRoundText lPlacement } } numEntrants standings(query: { page: 1, perPage: 500 }) { nodes { standing entrant { name } } } } }}",
+  "variables": { "slug": "shinto-series-smash-1" }  
+}
