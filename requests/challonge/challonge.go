@@ -18,6 +18,8 @@ type Challonge struct {
 		Participants   []Participant
 		Matches        []Match
 	}
+	// GetMatch(index)
+	// GetParticipant(index)
 }
 
 type Participant struct {
@@ -114,7 +116,7 @@ func (c *Challonge) FindMatch(order int) (index int) {
 // Bracket reset occurred if:
 //  1. The last two matches occurred between first and second place.
 //  2. The winners of the last two games are different.
-// Bracket reset points will not be awarded if the first-place player won from losers. 
+// Bracket reset points will not be awarded if the first-place player won from losers.
 func (c *Challonge) ApplyResetPoints() {
 	participants := c.Tournament.Participants
 	matches := c.Tournament.Matches

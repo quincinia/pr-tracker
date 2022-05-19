@@ -31,9 +31,21 @@ func TestDecoder(t *testing.T) {
 		}
 	})
 
-	t.Run("Decode participants", func(t *testing.T) {})
+	t.Run("Decode participants", func(t *testing.T) {
+		firstIndex := challonge.FindStanding(1)
+		winner := challonge.Tournament.Participants[firstIndex].Participant
+		if winner.Name != "Scisto" {
+			t.Error("got", winner.Name, "want Scisto")
+		}
+	})
 
-	t.Run("Decode matches", func(t *testing.T) {})
+	t.Run("Decode matches", func(t *testing.T) {
+		lastIndex := challonge.FindMatch(39)
+		grands := challonge.Tournament.Matches[lastIndex].Match
+		if grands.WinnerID != 135182824 {
+			t.Error("got", grands.WinnerID, "want", 135182824)
+		}
+	})
 }
 
 func TestTrunc(t *testing.T) {
@@ -76,4 +88,42 @@ func TestCalcPlacings(t *testing.T) {
 			t.Error("got", placings, "want", index+1)
 		}
 	}
+}
+
+func TestResetPoints(t *testing.T) {
+	var challonge *Challonge
+
+	t.Run("No reset points given", func(t *testing.T) {
+		response, err := os.Open("challonge.json")
+		if err != nil {
+			t.Error(err)
+		}
+		challonge, err = NewChallonge(response)
+		if err != nil {
+			t.Error(err)
+		}
+
+		challonge.ApplyResetPoints()
+
+		if challonge.Tournament.BracketReset != false {
+			t.Error("got", challonge.Tournament.BracketReset, "want", false)
+		}
+	})
+
+	t.Run("Give reset points", func(t *testing.T) {
+		response, err := os.Open("bracketreset.json")
+		if err != nil {
+			t.Error(err)
+		}
+		challonge, err = NewChallonge(response)
+		if err != nil {
+			t.Error(err)
+		}
+
+		challonge.ApplyResetPoints()
+
+		if challonge.Tournament.BracketReset != true {
+			t.Error("got", challonge.Tournament.BracketReset, "want", true)
+		}
+	})
 }

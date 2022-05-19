@@ -3,3 +3,9 @@ GET https://api.challonge.com/v1/tournaments/8ozc6ffz.json
     ?api_key={{$dotenv CHALLONGE_KEY}}
     &include_participants=1
     &include_matches=1
+
+### https://challonge.com/t4kq4f5b (contains bracket reset)
+GET https://api.challonge.com/v1/tournaments/t4kq4f5b.json
+    ?api_key={{$dotenv CHALLONGE_KEY}}
+    &include_participants=1
+    &include_matches=1
