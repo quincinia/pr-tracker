@@ -40,8 +40,12 @@ type Match struct {
 
 // Create a new tournament from a JSON source (generally an HTTP response)
 func NewChallonge(r io.Reader) (c *Challonge, err error) {
+	c = &Challonge{}
 	decoder := json.NewDecoder(r)
 	err = decoder.Decode(c)
+	if err != nil {
+		return nil, err
+	}
 	return
 }
 
@@ -80,22 +84,54 @@ func CalculatePlacings(numEntrants int) (placings int) {
 }
 
 // Pass match by reference?
-func isPresent(playerID int, m Match) bool {
+func isPresent(p Participant, m Match) bool {
 	match := m.Match
-	return playerID == match.Player1ID || playerID == match.Player2ID
+	participant := p.Participant
+	return participant.ID == match.Player1ID || participant.ID == match.Player2ID
 }
 
 // Returns the index of the first player with the given standing.
 func (c *Challonge) FindStanding(standing int) (index int) {
-	t := c.Tournament
-	for i := range t.Participants {
-		if t.Participants[i].Participant.Standing == standing {
+	for i, p := range c.Tournament.Participants {
+		if p.Participant.Standing == standing {
 			return i
 		}
 	}
 	return -1
 }
 
+// Similar to FindStanding, except with matches.
+func (c *Challonge) FindMatch(order int) (index int) {
+	for i, m := range c.Tournament.Matches {
+		if m.Match.Order == order {
+			return i
+		}
+	}
+	return -1
+}
+
+// Second place will receive bonus points if they made a bracket reset.
+// Bracket reset occurred if:
+//  1. The last two matches occurred between first and second place.
+//  2. The winners of the last two games are different.
+// Bracket reset points will not be awarded if the first-place player won from losers. 
 func (c *Challonge) ApplyResetPoints() {
-	
+	participants := c.Tournament.Participants
+	matches := c.Tournament.Matches
+
+	firstPlace := participants[c.FindStanding(1)]
+	secondPlace := participants[c.FindStanding(2)]
+	grands := matches[c.FindMatch(len(matches))]
+	finals := matches[c.FindMatch(len(matches)-1)]
+
+	c.Tournament.BracketReset =
+		isPresent(firstPlace, finals) &&
+			isPresent(secondPlace, finals) &&
+			isPresent(firstPlace, grands) &&
+			isPresent(secondPlace, grands) &&
+			finals.Match.WinnerID != grands.Match.WinnerID
+}
+
+func (c *Challonge) ApplyUniquePlacings() {
+	c.Tournament.UniquePlacings = CalculatePlacings(c.Tournament.NumEntrants)
 }
