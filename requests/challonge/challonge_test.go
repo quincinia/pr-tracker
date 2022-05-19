@@ -1,43 +1,46 @@
 package challonge
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
 )
 
 func TestDecoder(t *testing.T) {
-	response, err := os.Open("challonge.json")
-	if err != nil {
-		t.Error(err)
-	}
-	defer response.Close()
+	var challonge *Challonge
 
-	decoder := json.NewDecoder(response)
-	var c Challonge
-	err = decoder.Decode(&c)
-	if err != nil {
-		t.Error(err)
-	}
+	t.Run("Decode tournament fields", func(t *testing.T) {
+		response, err := os.Open("challonge.json")
+		if err != nil {
+			t.Error(err)
+		}
+		challonge, err = NewChallonge(response)
+		if err != nil {
+			t.Error(err)
+		}
 
-	tourney := c.Tourney
-	fmt.Println(tourney.Name, tourney.URL, tourney.NumEntrants)
+		tourney := challonge.Tournament
+		fmt.Println(tourney.Name, tourney.URL, tourney.NumEntrants)
 
-	if len(tourney.Participants) != 20 {
-		t.Error("Incorrect number of participants", len(tourney.Participants))
-	}
+		if len(tourney.Participants) != 20 {
+			t.Error("Incorrect number of participants", len(tourney.Participants))
+		}
 
-	if len(tourney.Matches) != 39 {
-		t.Error("Incorrect number of matches", len(tourney.Matches))
-	}
+		if len(tourney.Matches) != 39 {
+			t.Error("Incorrect number of matches", len(tourney.Matches))
+		}
+	})
+
+	t.Run("Decode participants", func(t *testing.T) {})
+
+	t.Run("Decode matches", func(t *testing.T) {})
 }
 
 func TestTrunc(t *testing.T) {
 	var n, exp, value int
 
 	t.Run("Negative n", func(t *testing.T) {
-		n = -1;
+		n = -1
 		_, value = TruncLog2(n)
 		if value != 0 {
 			t.Error("got", value, ", want 0")
