@@ -1,4 +1,4 @@
-// Package challonge contains functions for handling Challonge-based tournaments.
+// Package challonge contains structures for handling Challonge-based tournaments.
 // Package assumes tournaments are complete.
 package challonge
 
