@@ -33,6 +33,18 @@ func TestDecoder(t *testing.T) {
 			t.Error("Incorrect number of matches", len(event.Sets.Nodes))
 		}
 	})
-	t.Run("Decode participants", func(t *testing.T) {})
-	t.Run("Decode matches", func(t *testing.T) {})
+
+	t.Run("Decode participants", func(t *testing.T) {
+		firstIndex := smashgg.FindStanding(1)
+		winner := smashgg.GetEntrant(firstIndex)
+		if winner.Name != "FORT | Cless" {
+			t.Error("got", winner.Name, "want FORT | Cless")
+		}
+	})
+
+	t.Run("Decode matches", func(t *testing.T) {
+		if smashgg.ApplyResetPoints() != true {
+			t.Error("got", smashgg.ApplyResetPoints(), "want", true)
+		}
+	})
 }

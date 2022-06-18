@@ -49,3 +49,28 @@ func NewSmashgg(r io.Reader) (s *Smashgg, err error) {
 	}
 	return
 }
+
+func (s *Smashgg) FindStanding(standing int) (index int) {
+	for i, e := range s.Data.Event.Entrants.Nodes {
+		if e.Standing.Placement == standing {
+			return i
+		}
+	}
+	return -1
+}
+
+func (s *Smashgg) GetEntrant(index int) (entrant *Entrant) {
+	if index < 0 || index >= len(s.Data.Event.Entrants.Nodes) {
+		return
+	}
+	return &s.Data.Event.Entrants.Nodes[index]
+}
+
+func (s *Smashgg) ApplyResetPoints() bool {
+	for _, set := range s.Data.Event.Sets.Nodes {
+		if set.FullRoundText == "Grand Final Reset" && set.LPlacement == 2 {
+			return true
+		}
+	}
+	return false
+}
