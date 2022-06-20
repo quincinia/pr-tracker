@@ -2,6 +2,20 @@
 package models
 
 // Could probably use the sql.NullXxx types, but keeping it simple for now
+// Used when scanning
+type NullTourneyType struct {
+	TypeID *int
+	Name   *string
+	Valid  bool
+}
+
+
+type NullTier struct {
+	TierID     *int
+	Name       *string
+	Multiplier *int
+	Valid      bool
+}
 
 // Challonge or smash.gg
 type TourneyType struct {
@@ -11,8 +25,8 @@ type TourneyType struct {
 
 // See types.sql
 var (
-	CHALLONGE = TourneyType{1, "Challonge"}
-	STARTGG   = TourneyType{2, "start.gg"}
+	CHALLONGE = &TourneyType{1, "Challonge"}
+	STARTGG   = &TourneyType{2, "start.gg"}
 )
 
 // C	B	A	S
@@ -25,10 +39,10 @@ type Tier struct {
 
 // See tiers.sql
 var (
-	C_TIER = Tier{1, "C", 75}
-	B_TIER = Tier{2, "B", 150}
-	A_TIER = Tier{3, "A", 200}
-	S_TIER = Tier{4, "S", 300}
+	C_TIER = &Tier{1, "C", 75}
+	B_TIER = &Tier{2, "B", 150}
+	A_TIER = &Tier{3, "A", 200}
+	S_TIER = &Tier{4, "S", 300}
 )
 
 type Tournament struct {
