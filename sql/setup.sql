@@ -1,14 +1,14 @@
 drop table TourneyTypes;
 create table TourneyTypes (
     typeid  serial primary key,
-    name    text
+    name    text not null
 );
 
 drop table Tiers;
 create table Tiers (
     tierid      serial primary key,
-    name        text,
-    multiplier  int
+    name        text not null,
+    multiplier  int not null
 );
 
 drop table Tournaments;
