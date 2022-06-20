@@ -6,15 +6,26 @@ package models
 type NullTourneyType struct {
 	TypeID *int
 	Name   *string
-	Valid  bool
 }
 
+func (ntt *NullTourneyType) ToTourneyType() (tt *TourneyType) {
+	if ntt.TypeID != nil && ntt.Name != nil {
+		tt = &TourneyType{TypeID: *ntt.TypeID, Name: *ntt.Name}
+	}
+	return
+}
 
 type NullTier struct {
 	TierID     *int
 	Name       *string
 	Multiplier *int
-	Valid      bool
+}
+
+func (nt *NullTier) ToTier() (t *Tier) {
+	if nt.TierID != nil && nt.Name != nil && nt.Multiplier != nil {
+		t = &Tier{TierID: *nt.TierID, Name: *nt.Name, Multiplier: *nt.Multiplier}
+	}
+	return
 }
 
 // Challonge or smash.gg

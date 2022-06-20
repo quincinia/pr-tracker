@@ -43,9 +43,19 @@ func (t *Tournament) Create() (err error) {
 }
 
 func Retrieve(id int) (t Tournament, err error) {
+	var (
+		ntt NullTourneyType
+		nt  NullTier
+	)
 	query := `
 		select tourneyid, type, tourneytypes.name, url, numentrants, uniqueplacings, bracketreset, tier, tiers.name, tiers.multiplier
 		from tournaments
+		left outer join tourneytypes on type = typeid
+		left outer join tiers on tier = tierid
+		where tourneyid = $1;
 	`
-	err = DB.QueryRow("select ")
+	err = DB.QueryRow(query, id).Scan(t.TourneyID, ntt.TypeID, ntt.Name, t.URL, t.NumEntrants, t.UniquePlacings, t.BracketReset, nt.TierID, nt.Name, nt.Multiplier)
+	t.Type = ntt.ToTourneyType()
+	t.Tier = nt.ToTier()
+	return
 }
