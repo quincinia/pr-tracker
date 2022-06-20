@@ -48,14 +48,27 @@ func Retrieve(id int) (t Tournament, err error) {
 		nt  NullTier
 	)
 	query := `
-		select tourneyid, type, tourneytypes.name, url, numentrants, uniqueplacings, bracketreset, tier, tiers.name, tiers.multiplier
+		select tourneyid, type, tourneytypes.name, tournaments.name, url, numentrants, uniqueplacings, bracketreset, tier, tiers.name, tiers.multiplier
 		from tournaments
 		left outer join tourneytypes on type = typeid
 		left outer join tiers on tier = tierid
 		where tourneyid = $1;
 	`
-	err = DB.QueryRow(query, id).Scan(t.TourneyID, ntt.TypeID, ntt.Name, t.URL, t.NumEntrants, t.UniquePlacings, t.BracketReset, nt.TierID, nt.Name, nt.Multiplier)
+	err = DB.QueryRow(query, id).Scan(&t.TourneyID, &ntt.TypeID, &ntt.Name, &t.Name, &t.URL, &t.NumEntrants, &t.UniquePlacings, &t.BracketReset, &nt.TierID, &nt.Name, &nt.Multiplier)
 	t.Type = ntt.ToTourneyType()
 	t.Tier = nt.ToTier()
+	return
+}
+
+func (t *Tournament) Update() (err error) {
+	var typeid, tierid *int
+	query := "update tournaments set type = $2, name = $3, url = $4, numentrants = $5, uniqueplacings = $6, bracketreset = $7, tier = $8 where tourneyid = $1"
+	if t.Type != nil {
+		typeid = &t.Type.TypeID
+	}
+	if t.Tier != nil {
+		tierid = &t.Tier.TierID
+	}
+	_, err = DB.Exec(query, t.TourneyID, typeid, t.Name, t.URL, t.NumEntrants, t.UniquePlacings, t.BracketReset, tierid)
 	return
 }
