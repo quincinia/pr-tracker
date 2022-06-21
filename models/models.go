@@ -28,6 +28,18 @@ func (nt *NullTier) ToTier() (t *Tier) {
 	return
 }
 
+type NullPlayer struct {
+	PlayerID *int
+	Name     *string
+}
+
+func (np *NullPlayer) ToPlayer() (p *Player) {
+	if np.PlayerID != nil && np.Name != nil {
+		p = &Player{PlayerID: *np.PlayerID, Name: *np.Name}
+	}
+	return
+}
+
 // Challonge or smash.gg
 type TourneyType struct {
 	TypeID int

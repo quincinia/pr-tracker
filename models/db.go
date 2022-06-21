@@ -42,7 +42,7 @@ func (t *Tournament) Create() (err error) {
 	return
 }
 
-func Retrieve(id int) (t Tournament, err error) {
+func RetrieveTournament(id int) (t Tournament, err error) {
 	var (
 		ntt NullTourneyType
 		nt  NullTier
@@ -70,5 +70,56 @@ func (t *Tournament) Update() (err error) {
 		tierid = &t.Tier.TierID
 	}
 	_, err = DB.Exec(query, t.TourneyID, typeid, t.Name, t.URL, t.NumEntrants, t.UniquePlacings, t.BracketReset, tierid)
+	return
+}
+
+func (t *Tournament) Delete() (err error) {
+	_, err = DB.Exec("delete from tournaments where tourneyid = $1", t.TourneyID)
+	return
+}
+
+func (a *Attendee) Create() (err error) {
+	query := "insert into attendees (tourney, player, name, standing) values ($1, $2, $3, $4) returning attendeeid"
+	
+	stmt, err := DB.Prepare(query)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	var playerid *int
+	if a.Player != nil {
+		playerid = &a.Player.PlayerID
+	}
+
+	err = stmt.QueryRow(query, a.Tourney, playerid, a.Name, a.Standing).Scan(&a.AttendeeID)
+	return
+}
+
+func RetrieveAttendee(id int) (a Attendee, err error) {
+	var np NullPlayer
+	query := `
+		select attendeeid, tourney, player, players.name, attendees.name, standing
+		from attendees
+		left outer join players on player = playerid
+		where attendeeid = $1
+	`
+	err = DB.QueryRow(query, id).Scan(&a.AttendeeID, &a.Tourney, &np.PlayerID, &np.Name, &a.Name, &a.Standing)
+	a.Player = np.ToPlayer()
+	return
+}
+
+func (a *Attendee) Update() (err error) {
+	var playerid *int
+	query := "update players set tourney = $2, player = $3, name = $4, standing = $5 where attendeeid = $1"
+	if a.Player != nil {
+		playerid = &a.Player.PlayerID
+	}
+	_, err = DB.Exec(query, a.AttendeeID, a.Tourney, playerid, a.Name, a.Standing)
+	return
+}
+
+func (a *Attendee) Delete() (err error) {
+	_, err = DB.Exec("delete from attendees where attendeeid = $1", a.AttendeeID)
 	return
 }

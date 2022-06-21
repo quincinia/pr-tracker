@@ -42,9 +42,9 @@ func TestTournament(t *testing.T) {
 		}
 	})
 
-	t.Run("Tournament retrieval" , func(t *testing.T) {
+	t.Run("Tournament retrieval", func(t *testing.T) {
 		for _, id := range ids {
-			tourney, err := Retrieve(id)
+			tourney, err := RetrieveTournament(id)
 			if err != nil {
 				t.Error(err)
 			}
@@ -66,7 +66,7 @@ func TestTournament(t *testing.T) {
 	})
 
 	t.Run("Tournament update", func(t *testing.T) {
-		tourney, err := Retrieve(ids[0])
+		tourney, err := RetrieveTournament(ids[0])
 		if err != nil {
 			t.Error(err)
 		}
@@ -79,7 +79,7 @@ func TestTournament(t *testing.T) {
 			t.Error(err)
 		}
 
-		tourney, err = Retrieve(ids[0])
+		tourney, err = RetrieveTournament(ids[0])
 		if err != nil {
 			t.Error(err)
 		}
