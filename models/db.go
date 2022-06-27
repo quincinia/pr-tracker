@@ -80,7 +80,7 @@ func (t *Tournament) Delete() (err error) {
 
 func (a *Attendee) Create() (err error) {
 	query := "insert into attendees (tourney, player, name, standing) values ($1, $2, $3, $4) returning attendeeid"
-	
+
 	stmt, err := DB.Prepare(query)
 	if err != nil {
 		return
@@ -96,7 +96,7 @@ func (a *Attendee) Create() (err error) {
 	return
 }
 
-func RetrieveAttendee(id int) (a Attendee, err error) {
+func RetrieveAttendee(attendeeid int) (a Attendee, err error) {
 	var np NullPlayer
 	query := `
 		select attendeeid, tourney, player, players.name, attendees.name, standing
@@ -104,7 +104,7 @@ func RetrieveAttendee(id int) (a Attendee, err error) {
 		left outer join players on player = playerid
 		where attendeeid = $1
 	`
-	err = DB.QueryRow(query, id).Scan(&a.AttendeeID, &a.Tourney, &np.PlayerID, &np.Name, &a.Name, &a.Standing)
+	err = DB.QueryRow(query, attendeeid).Scan(&a.AttendeeID, &a.Tourney, &np.PlayerID, &np.Name, &a.Name, &a.Standing)
 	a.Player = np.ToPlayer()
 	return
 }
@@ -122,4 +122,15 @@ func (a *Attendee) Update() (err error) {
 func (a *Attendee) Delete() (err error) {
 	_, err = DB.Exec("delete from attendees where attendeeid = $1", a.AttendeeID)
 	return
+}
+
+func (as *Attendees) Save(tourneyid int) (failindex int, err error) {
+	for i := range *as {
+		(*as)[i].Tourney = tourneyid
+		err = (*as)[i].Create()
+		if err != nil {
+			return i, err
+		}
+	}
+	return -1, err
 }

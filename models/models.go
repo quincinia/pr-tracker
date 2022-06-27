@@ -92,4 +92,5 @@ type Attendee struct {
 	Standing   int
 }
 
+// Keeping this separate rather than putting it under Tournament
 type Attendees []Attendee
