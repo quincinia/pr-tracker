@@ -42,7 +42,7 @@ func (t *Tournament) Create() (err error) {
 	return
 }
 
-func RetrieveTournament(id int) (t Tournament, err error) {
+func GetTournament(id int) (t Tournament, err error) {
 	var (
 		ntt NullTourneyType
 		nt  NullTier
@@ -57,6 +57,33 @@ func RetrieveTournament(id int) (t Tournament, err error) {
 	err = DB.QueryRow(query, id).Scan(&t.TourneyID, &ntt.TypeID, &ntt.Name, &t.Name, &t.URL, &t.NumEntrants, &t.UniquePlacings, &t.BracketReset, &nt.TierID, &nt.Name, &nt.Multiplier)
 	t.Type = ntt.ToTourneyType()
 	t.Tier = nt.ToTier()
+	return
+}
+
+func GetAttendees(tourneyid int) (as Attendees, err error) {
+	var (
+		attendees []Attendee
+		np        NullPlayer
+	)
+
+	rows, err := DB.Query(`
+		select attendeeid, tourney, player, players.name, attendees.name, standing
+		from attendees
+		left outer join players on player = playerid
+	`)
+	if err != nil {
+		return
+	}
+
+	for rows.Next() {
+		a := Attendee{}
+		err = rows.Scan(&a.AttendeeID, &a.Tourney, &np.PlayerID, &np.Name, &a.Name, &a.Standing)
+		if err != nil {
+			return
+		}
+		attendees = append(attendees, a)
+	}
+	rows.Close()
 	return
 }
 
@@ -96,7 +123,7 @@ func (a *Attendee) Create() (err error) {
 	return
 }
 
-func RetrieveAttendee(attendeeid int) (a Attendee, err error) {
+func GetAttendee(attendeeid int) (a Attendee, err error) {
 	var np NullPlayer
 	query := `
 		select attendeeid, tourney, player, players.name, attendees.name, standing
@@ -125,6 +152,10 @@ func (a *Attendee) Delete() (err error) {
 }
 
 func (as *Attendees) Save(tourneyid int) (failindex int, err error) {
+	failindex = -1
+	if *as == nil {
+		return
+	}
 	for i := range *as {
 		(*as)[i].Tourney = tourneyid
 		err = (*as)[i].Create()
@@ -132,5 +163,5 @@ func (as *Attendees) Save(tourneyid int) (failindex int, err error) {
 			return i, err
 		}
 	}
-	return -1, err
+	return
 }
