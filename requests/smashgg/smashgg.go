@@ -5,6 +5,8 @@ package smashgg
 import (
 	"encoding/json"
 	"io"
+	"pr-tracker/models"
+	"pr-tracker/requests"
 )
 
 type Smashgg struct {
@@ -22,6 +24,8 @@ type Smashgg struct {
 		}
 	}
 }
+
+type Startgg = Smashgg
 
 type Tournament struct {
 	Name string
@@ -73,4 +77,27 @@ func (s *Smashgg) ApplyResetPoints() bool {
 		}
 	}
 	return false
+}
+
+func (s *Smashgg) ApplyUniquePlacings() int {
+	return requests.CalculatePlacings(s.Data.Event.NumEntrants)
+}
+
+func (s *Smashgg) ToTournament() (t models.Tournament, as []models.Attendee) {
+	t = models.Tournament{
+		Type:           models.STARTGG,
+		Name:           s.Data.Tournament.Name,
+		URL:            s.Data.Tournament.URL,
+		NumEntrants:    s.Data.Event.NumEntrants,
+		UniquePlacings: s.ApplyUniquePlacings(),
+		BracketReset:   s.ApplyResetPoints(),
+	}
+	for _, e := range s.Data.Event.Entrants.Nodes {
+		a := models.Attendee{
+			Name: e.Name,
+			Standing: e.Standing.Placement,
+		}
+		as = append(as, a)
+	}
+	return
 }
