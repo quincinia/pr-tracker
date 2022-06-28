@@ -1,6 +1,7 @@
 package challonge
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
@@ -126,4 +127,33 @@ func TestResetPoints(t *testing.T) {
 			t.Error("got", challonge.Tournament.BracketReset, "want", true)
 		}
 	})
+}
+
+func TestConversion(t *testing.T) {
+	var challonge *Challonge
+
+	response, err := os.Open("challonge.json")
+	if err != nil {
+		t.Error(err)
+	}
+	challonge, err = NewChallonge(response)
+	if err != nil {
+		t.Error(err)
+	}
+
+	tourney, attendees := challonge.ToTournament()
+
+	if tourney.Type.Name != "Challonge" {
+		t.Error("got", tourney.Type.Name, "want Challonge")
+	}
+
+	if len(attendees) != 20 {
+		t.Error("got", len(attendees), "want 20")
+	}
+
+	output, _ := json.MarshalIndent(tourney, "", "\t")
+	fmt.Println(string(output))
+
+	output, _ = json.MarshalIndent(attendees, "", "\t")
+	fmt.Println(string(output))
 }

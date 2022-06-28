@@ -5,6 +5,7 @@ package challonge
 import (
 	"encoding/json"
 	"io"
+	"pr-tracker/models"
 )
 
 // The JSON response puts a wrapper around the tournament object.
@@ -136,4 +137,25 @@ func (c *Challonge) ApplyResetPoints() {
 
 func (c *Challonge) ApplyUniquePlacings() {
 	c.Tournament.UniquePlacings = CalculatePlacings(c.Tournament.NumEntrants)
+}
+
+func (c *Challonge) ToTournament() (t models.Tournament, as []models.Attendee) {
+	c.ApplyUniquePlacings()
+	c.ApplyResetPoints()
+	t = models.Tournament{
+		Type:           models.CHALLONGE,
+		Name:           c.Tournament.Name,
+		URL:            c.Tournament.URL,
+		NumEntrants:    c.Tournament.NumEntrants,
+		UniquePlacings: c.Tournament.UniquePlacings,
+		BracketReset:   c.Tournament.BracketReset,
+	}
+	for _, p := range c.Tournament.Participants {
+		a := models.Attendee{
+			Name:     p.Participant.Name,
+			Standing: p.Participant.Standing,
+		}
+		as = append(as, a)
+	}
+	return
 }
