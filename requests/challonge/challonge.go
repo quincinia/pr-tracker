@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"io"
 	"pr-tracker/models"
+	"pr-tracker/requests"
 )
 
 // The JSON response puts a wrapper around the tournament object.
@@ -48,40 +49,6 @@ func NewChallonge(r io.Reader) (c *Challonge, err error) {
 	err = decoder.Decode(c)
 	if err != nil {
 		return nil, err
-	}
-	return
-}
-
-// In JavaScript: Math.trunc(Math.log2(n))
-// Do not use with negative numbers.
-// See: https://stackoverflow.com/questions/19339594/truncated-binary-logarithm
-func TruncLog2(n int) (exp, value int) {
-	if n <= 0 {
-		return
-	}
-	value = 1
-	n = n >> 1
-	for n != 0 {
-		exp++
-		value *= 2
-		n = n >> 1
-	}
-	return
-}
-
-func CalculatePlacings(numEntrants int) (placings int) {
-	// Annoying edge cases
-	if numEntrants < 1 {
-		return -1
-	}
-	if numEntrants <= 4 {
-		return numEntrants
-	}
-
-	exp, value := TruncLog2(numEntrants)
-	placings = 2*exp + 1
-	if numEntrants > (3*value)/2 {
-		placings++
 	}
 	return
 }
@@ -136,7 +103,7 @@ func (c *Challonge) ApplyResetPoints() {
 }
 
 func (c *Challonge) ApplyUniquePlacings() {
-	c.Tournament.UniquePlacings = CalculatePlacings(c.Tournament.NumEntrants)
+	c.Tournament.UniquePlacings = requests.CalculatePlacings(c.Tournament.NumEntrants)
 }
 
 func (c *Challonge) ToTournament() (t models.Tournament, as []models.Attendee) {
