@@ -5,3 +5,10 @@ A simple ranking system for round-robin, single-, and double-elimination tournam
 ## Usage
 
 ## Formula
+
+## Todo
+
+[ ] Set up server
+[ ] Set up frontend
+[ ] GetAttendees
+[ ] Converter function for request objects
