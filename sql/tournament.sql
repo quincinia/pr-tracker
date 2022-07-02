@@ -1,0 +1,1 @@
+insert into tournaments (type, name, url, numentrants, uniqueplacings, bracketreset, tier) values (null, 'test', '', 0, 0, false, null);
