@@ -42,8 +42,8 @@ func (np *NullPlayer) ToPlayer() (p *Player) {
 
 // Challonge or smash.gg
 type TourneyType struct {
-	TypeID int
-	Name   string
+	TypeID int    `json:"typeID"`
+	Name   string `json:"name"`
 }
 
 // See types.sql
@@ -55,9 +55,9 @@ var (
 // C	B	A	S
 // 75	150	200	300
 type Tier struct {
-	TierID     int
-	Name       string
-	Multiplier int
+	TierID     int    `json:"tierID"`
+	Name       string `json:"name"`
+	Multiplier int    `json:"multiplier"`
 }
 
 // See tiers.sql
@@ -69,28 +69,35 @@ var (
 )
 
 type Tournament struct {
-	TourneyID      int
-	Type           *TourneyType
-	Name           string
-	URL            string
-	NumEntrants    int
-	UniquePlacings int
-	BracketReset   bool
-	Tier           *Tier
+	TourneyID      int          `json:"tourneyID"`
+	Type           *TourneyType `json:"type"`
+	Name           string       `json:"name"`
+	URL            string       `json:"url"`
+	NumEntrants    int          `json:"numEntrants"`
+	UniquePlacings int          `json:"uniquePlacings"`
+	BracketReset   bool         `json:"bracketReset"`
+	Tier           *Tier        `json:"tier"`
 }
 
 type Player struct {
-	PlayerID int
-	Name     string
+	PlayerID int    `json:"playerID"`
+	Name     string `json:"name"`
 }
 
 type Attendee struct {
-	AttendeeID int
-	Tourney    int
-	Player     *Player
-	Name       string
-	Standing   int
+	AttendeeID int     `json:"attendeeID"`
+	Tourney    int     `json:"tourney"`
+	Player     *Player `json:"player"`
+	Name       string  `json:"name"`
+	Standing   int     `json:"standing"`
 }
 
 // Keeping this separate rather than putting it under Tournament
+// Deprecated
 type Attendees []Attendee
+
+// Used when making HTTP requests
+type FullTournament struct {
+	Tournament
+	Attendees []Attendee `json:"attendees"`
+}
