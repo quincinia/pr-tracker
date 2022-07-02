@@ -100,6 +100,7 @@ func (t *Tournament) Update() (err error) {
 	return
 }
 
+// This will invalidate foreign keys of the attendees; confirm if it throws an error
 func (t *Tournament) Delete() (err error) {
 	_, err = DB.Exec("delete from tournaments where tourneyid = $1", t.TourneyID)
 	return
@@ -151,6 +152,7 @@ func (a *Attendee) Delete() (err error) {
 	return
 }
 
+// Deprecated
 func (as *Attendees) Save(tourneyid int) (failindex int, err error) {
 	failindex = -1
 	if *as == nil {
@@ -161,6 +163,38 @@ func (as *Attendees) Save(tourneyid int) (failindex int, err error) {
 		err = (*as)[i].Create()
 		if err != nil {
 			return i, err
+		}
+	}
+	return
+}
+
+// Omitting the failindex because I'm not expecting to use it
+func CreateAttendees(attendees []Attendee, tourneyid int) (err error) {
+	for i := range attendees {
+		attendees[i].Tourney = tourneyid
+		err = attendees[i].Create()
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
+func DeleteAttendees(tourneyid int) (err error) {
+	_, err = DB.Exec("delete from attendees where tourneyid = $1", tourneyid)
+	return
+}
+
+func (ft *FullTournament) Create() (err error) {
+	err = ft.Tournament.Create()
+	if err != nil {
+		return
+	}
+	for i := range ft.Attendees {
+		ft.Attendees[i].Tourney = ft.TourneyID
+		err = ft.Attendees[i].Create()
+		if err != nil {
+			return
 		}
 	}
 	return
