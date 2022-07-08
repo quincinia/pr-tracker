@@ -23,6 +23,7 @@ func TournamentsRouter(w http.ResponseWriter, r *http.Request) {
 		err = deleteTournament(w, r)
 	}
 	if err != nil {
+		// fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -97,10 +98,11 @@ func deleteTournament(w http.ResponseWriter, r *http.Request) (err error) {
 		return
 	}
 
-	err = models.DeleteAttendees(fulltournament.TourneyID)
-	if err != nil {
-		return
-	}
+	// No longer needed since attendees are deleted with the tournament
+	// err = models.DeleteAttendees(fulltournament.TourneyID)
+	// if err != nil {
+	// 	return
+	// }
 
 	w.WriteHeader(200)
 	return

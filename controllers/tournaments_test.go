@@ -78,9 +78,24 @@ func TestPostTournament(t *testing.T) {
 	}
 }
 
-// func TestDeleteTournament(t *testing.T) {
-// 	mux := http.NewServeMux()
-// 	mux.HandleFunc("/tournament/", TournamentsRouter)
-// 	writer := httptest.NewRecorder()
+func TestDeleteTournament(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/tournament/", TournamentsRouter)
+	writer := httptest.NewRecorder()
 
-// }
+	tourney := FullTournament{
+		Tournament: Tournament{Name: "DELETE Tournament"},
+		Attendees:  []Attendee{{Name: "DELETE Attendee", Standing: 1}},
+	}
+	err := tourney.Create()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	request, _ := http.NewRequest("DELETE", "/tournament/"+strconv.Itoa(tourney.TourneyID), nil)
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 200 {
+		t.Error("got", writer.Code, "want 200")
+	}
+}

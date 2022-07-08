@@ -177,7 +177,7 @@ func CreateAttendees(attendees []Attendee, tourneyid int) (err error) {
 }
 
 func DeleteAttendees(tourneyid int) (err error) {
-	_, err = DB.Exec("delete from attendees where tourneyid = $1", tourneyid)
+	_, err = DB.Exec("delete from attendees where tourney = $1", tourneyid)
 	return
 }
 
