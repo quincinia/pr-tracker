@@ -60,11 +60,8 @@ func GetTournament(id int) (t Tournament, err error) {
 	return
 }
 
-func GetAttendees(tourneyid int) (as Attendees, err error) {
-	var (
-		attendees []Attendee
-		np        NullPlayer
-	)
+func GetAttendees(tourneyid int) (as []Attendee, err error) {
+	var np NullPlayer
 
 	rows, err := DB.Query(`
 		select attendeeid, tourney, player, players.name, attendees.name, standing
@@ -81,7 +78,7 @@ func GetAttendees(tourneyid int) (as Attendees, err error) {
 		if err != nil {
 			return
 		}
-		attendees = append(attendees, a)
+		as = append(as, a)
 	}
 	rows.Close()
 	return
@@ -100,7 +97,6 @@ func (t *Tournament) Update() (err error) {
 	return
 }
 
-// This will invalidate foreign keys of the attendees; confirm if it throws an error
 func (t *Tournament) Delete() (err error) {
 	_, err = DB.Exec("delete from tournaments where tourneyid = $1", t.TourneyID)
 	return
@@ -120,7 +116,7 @@ func (a *Attendee) Create() (err error) {
 		playerid = &a.Player.PlayerID
 	}
 
-	err = stmt.QueryRow(query, a.Tourney, playerid, a.Name, a.Standing).Scan(&a.AttendeeID)
+	err = stmt.QueryRow(a.Tourney, playerid, a.Name, a.Standing).Scan(&a.AttendeeID)
 	return
 }
 
