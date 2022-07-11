@@ -28,7 +28,7 @@ func tearDown() {
 }
 func TestGetTournament(t *testing.T) {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/tournament/", TournamentsRouter)
+	mux.HandleFunc("/tournaments/", TournamentsRouter)
 	writer := httptest.NewRecorder()
 
 	tourney := FullTournament{
@@ -40,7 +40,7 @@ func TestGetTournament(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	request, _ := http.NewRequest("GET", "/tournament/"+strconv.Itoa(tourney.TourneyID), nil)
+	request, _ := http.NewRequest("GET", "/tournaments/"+strconv.Itoa(tourney.TourneyID), nil)
 	mux.ServeHTTP(writer, request)
 
 	if writer.Code != 200 {
@@ -57,9 +57,46 @@ func TestGetTournament(t *testing.T) {
 	}
 }
 
+func TestGetTournaments(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/tournaments/", TournamentsRouter)
+	writer := httptest.NewRecorder()
+
+	tests := []FullTournament{
+		{
+			Tournament: Tournament{Name: "GET Tournaments 1"},
+			Attendees:  []Attendee{{Name: "GET Attendee 1", Standing: 1}},
+		},
+		{
+			Tournament: Tournament{Name: "GET Tournaments 2"},
+			Attendees:  []Attendee{{Name: "GET Attendee 2", Standing: 1}},
+		},
+	}
+
+	for i := range tests {
+		err := tests[i].Create()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	request, _ := http.NewRequest("GET", "/tournaments/", nil)
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 200 {
+		t.Errorf("Response code is %v", writer.Code)
+	}
+
+	var body []Tournament
+	json.Unmarshal(writer.Body.Bytes(), &body)
+	if len(body) < 2 {
+		t.Error("got", len(body), "want >=2")
+	}
+}
+
 func TestPostTournament(t *testing.T) {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/tournament/", TournamentsRouter)
+	mux.HandleFunc("/tournaments/", TournamentsRouter)
 	writer := httptest.NewRecorder()
 
 	tourney := FullTournament{
@@ -70,7 +107,7 @@ func TestPostTournament(t *testing.T) {
 	output, _ := json.Marshal(tourney)
 	body := bytes.NewReader(output)
 
-	request, _ := http.NewRequest("POST", "/tournament/", body)
+	request, _ := http.NewRequest("POST", "/tournaments/", body)
 	mux.ServeHTTP(writer, request)
 
 	if writer.Code != 200 {
@@ -80,7 +117,7 @@ func TestPostTournament(t *testing.T) {
 
 func TestDeleteTournament(t *testing.T) {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/tournament/", TournamentsRouter)
+	mux.HandleFunc("/tournaments/", TournamentsRouter)
 	writer := httptest.NewRecorder()
 
 	tourney := FullTournament{
@@ -92,7 +129,7 @@ func TestDeleteTournament(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	request, _ := http.NewRequest("DELETE", "/tournament/"+strconv.Itoa(tourney.TourneyID), nil)
+	request, _ := http.NewRequest("DELETE", "/tournaments/"+strconv.Itoa(tourney.TourneyID), nil)
 	mux.ServeHTTP(writer, request)
 
 	if writer.Code != 200 {

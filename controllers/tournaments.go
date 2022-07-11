@@ -4,6 +4,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"path"
 	"pr-tracker/models"
@@ -12,6 +13,7 @@ import (
 
 func TournamentsRouter(w http.ResponseWriter, r *http.Request) {
 	var err error
+	// fmt.Println(r.URL.Path)
 	switch r.Method {
 	case "GET":
 		err = getTournament(w, r)
@@ -23,7 +25,7 @@ func TournamentsRouter(w http.ResponseWriter, r *http.Request) {
 		err = deleteTournament(w, r)
 	}
 	if err != nil {
-		// fmt.Println(err)
+		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -31,6 +33,12 @@ func TournamentsRouter(w http.ResponseWriter, r *http.Request) {
 
 // Returns full tournament data (including attendees)
 func getTournament(w http.ResponseWriter, r *http.Request) (err error) {
+	// This may be an issue?
+	// Instead of hard-coding the route, you can pass the preferred route when it is attached to the mux?
+	if r.URL.Path == "/tournaments/" {
+		return getTournaments(w, r)
+	}
+
 	id, err := strconv.Atoi(path.Base(r.URL.Path))
 	if err != nil {
 		return
@@ -49,6 +57,23 @@ func getTournament(w http.ResponseWriter, r *http.Request) (err error) {
 	fulltournament := models.FullTournament{Tournament: tournament, Attendees: attendees}
 
 	output, err := json.MarshalIndent(&fulltournament, "", "\t")
+	if err != nil {
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+	return
+}
+
+// Returns only the tournament data (no attendees)
+func getTournaments(w http.ResponseWriter, r *http.Request) (err error) {
+	tournaments, err := models.GetTournaments()
+	if err != nil {
+		return
+	}
+
+	output, err := json.MarshalIndent(&tournaments, "", "\t")
 	if err != nil {
 		return
 	}

@@ -60,6 +60,34 @@ func GetTournament(id int) (t Tournament, err error) {
 	return
 }
 
+func GetTournaments() (ts []Tournament, err error) {
+	var (
+		ntt NullTourneyType
+		nt  NullTier
+	)
+
+	rows, err := DB.Query(`
+		select tourneyid, typeid, tourneytypes.name, tournaments.name, url, numentrants, uniqueplacings, bracketreset, tierid, tiers.name, multiplier
+		from tournaments
+		left outer join tourneytypes on type = typeid
+		left outer join tiers on tier = tierid
+	`)
+	if err != nil {
+		return
+	}
+
+	for rows.Next() {
+		t := Tournament{}
+		err = rows.Scan(&t.TourneyID, &ntt.TypeID, &ntt.Name, &t.Name, &t.URL, &t.NumEntrants, &t.UniquePlacings, &t.BracketReset, &nt.TierID, &nt.Name, &nt.Multiplier)
+		if err != nil {
+			return
+		}
+		ts = append(ts, t)
+	}
+	rows.Close()
+	return
+}
+
 func GetAttendees(tourneyid int) (as []Attendee, err error) {
 	var np NullPlayer
 
