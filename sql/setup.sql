@@ -39,5 +39,5 @@ create table Attendees (
     name        text,
     standing    int,
     foreign key (tourney) references Tournaments(tourneyid) on delete cascade,
-    foreign key (player) references Players(playerid)
+    foreign key (player) references Players(playerid) on delete set null
 );
