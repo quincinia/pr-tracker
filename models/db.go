@@ -125,6 +125,7 @@ func (t *Tournament) Update() (err error) {
 	return
 }
 
+// Deleted tournaments will delete their attendees
 func (t *Tournament) Delete() (err error) {
 	_, err = DB.Exec("delete from tournaments where tourneyid = $1", t.TourneyID)
 	return
@@ -221,5 +222,73 @@ func (ft *FullTournament) Create() (err error) {
 			return
 		}
 	}
+	return
+}
+
+func (p *Player) Create() (err error) {
+	err = DB.QueryRow("insert into players (name) values ($1) returning playerid", p.Name).Scan(&p.PlayerID)
+	return
+}
+
+// Player data will also return attendance
+func GetPlayer(id int) (pa PlayerAttendance, err error) {
+	err = DB.QueryRow("select playerid, name from players where playerid = $1", id).Scan(&pa.PlayerID, &pa.Name)
+	if err != nil {
+		return
+	}
+
+	rows, err := DB.Query("select attendeeid, tourney, name, standing from attendees where player = $1")
+	if err != nil {
+		return
+	}
+
+	for rows.Next() {
+		// See PlayerAttendance definition
+		var a struct {
+			AttendeeID int    `json:"attendeeID"`
+			Tourney    int    `json:"tourney"`
+			Name       string `json:"name"`
+			Standing   int    `json:"standing"`
+		}
+		err = rows.Scan(&a.AttendeeID, &a.Tourney, &a.Name, &a.Standing)
+		if err != nil {
+			return
+		}
+		pa.Attendance = append(pa.Attendance, a)
+	}
+	rows.Close()
+	return
+}
+
+func GetPlayers() (pas []PlayerAttendance, err error) {
+	rows, err := DB.Query("select playerid from players")
+	if err != nil {
+		return
+	}
+
+	for rows.Next() {
+		var (
+			id int
+			pa PlayerAttendance
+		)
+		err = rows.Scan(&id)
+		if err != nil {
+			return
+		}
+
+		pa, err = GetPlayer(id)
+		if err != nil {
+			return
+		}
+
+		pas = append(pas, pa)
+	}
+	rows.Close()
+	return
+}
+
+// Deleted players will remove their attendance
+func DeletePlayer(id int) (err error) {
+	_, err = DB.Exec("delete from players where playerid = %1", id)
 	return
 }

@@ -92,6 +92,16 @@ type Attendee struct {
 	Standing   int     `json:"standing"`
 }
 
+type PlayerAttendance struct {
+	Player
+	Attendance []struct {
+		AttendeeID int    `json:"attendeeID"`
+		Tourney    int    `json:"tourney"`
+		Name       string `json:"name"`
+		Standing   int    `json:"standing"`
+	} `json:"attendance"`
+}
+
 // Keeping this separate rather than putting it under Tournament
 // Deprecated
 type Attendees []Attendee
