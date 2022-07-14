@@ -1,4 +1,4 @@
-package controllers
+package tournaments
 
 import (
 	"bytes"

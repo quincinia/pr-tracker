@@ -1,6 +1,6 @@
-// Package controllers contains REST handlers to work with various routes of the application
+// Package tournaments contains REST handlers to work with handling tournaments
 // tournaments.go contains handlers for managing tournament data
-package controllers
+package tournaments
 
 import (
 	"encoding/json"

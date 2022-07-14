@@ -1,4 +1,4 @@
-package controllers
+package players
 
 import (
 	"encoding/json"
