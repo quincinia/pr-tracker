@@ -1,6 +1,7 @@
 package players
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -75,14 +76,14 @@ func TestGetPlayers(t *testing.T) {
 	tournaments := []FullTournament{
 		{
 			Tournament: Tournament{Name: "GET Players Tournament 1"},
-			Attendees:  []Attendee{
-				{Player: &player1, Name: "GET Players Attendee 1.1", Standing: 1}, 
+			Attendees: []Attendee{
+				{Player: &player1, Name: "GET Players Attendee 1.1", Standing: 1},
 				{Player: &player2, Name: "GET Players Attendee 1.2", Standing: 2},
 			},
 		},
 		{
 			Tournament: Tournament{Name: "GET Players Tournament 2"},
-			Attendees:  []Attendee{
+			Attendees: []Attendee{
 				{Player: &player1, Name: "GET Players Attendee 2.1", Standing: 1},
 			},
 		},
@@ -104,33 +105,78 @@ func TestGetPlayers(t *testing.T) {
 
 	var body []PlayerAttendance
 	json.Unmarshal(writer.Body.Bytes(), &body)
-	if len(body) != 2 {
-		t.Error("got", len(body), "want 2")
+	if len(body) < 2 {
+		t.Error("got", len(body), "want >= 2")
 	}
 	// Assuming the players are returned in the order defined above
-	if body[0].Player != player1 {
-		t.Error("got", body[0].Player, "want", player1)
+	player1_index := -1
+	player2_index := -1
+	for i := range body {
+		switch body[i].Player {
+		case player1:
+			player1_index = i
+		case player2:
+			player2_index = i
+		}
 	}
-	if body[1].Player != player2 {
-		t.Error("got", body[1].Player, "want", player2)
+	if player1_index == -1 || player2_index == -1 {
+		t.Error("could not find saved players")
 	}
 
-	if len(body[0].Attendance) != 2 {
-		t.Error("got", len(body[0].Attendance), "want 2")
+	if len(body[player1_index].Attendance) != 2 {
+		t.Error("got", len(body[player1_index].Attendance), "want 2")
 	}
-	if len(body[1].Attendance) != 1 {
-		t.Error("got", len(body[1].Attendance), "want 1")
+	if len(body[player2_index].Attendance) != 1 {
+		t.Error("got", len(body[player2_index].Attendance), "want 1")
 	}
 }
 
 func TestPostPlayer(t *testing.T) {
-	// mux := http.NewServeMux()
-	// mux.HandleFunc("/players/", PlayersRouter)
-	// writer := httptest.NewRecorder()
+	mux := http.NewServeMux()
+	mux.HandleFunc("/players/", PlayersRouter)
+	writer := httptest.NewRecorder()
+
+	player := Player{Name: "POST Player test"}
+	err := player.Create()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	output, _ := json.Marshal(player)
+	body := bytes.NewReader(output)
+
+	request, _ := http.NewRequest("POST", "/players/", body)
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 200 {
+		t.Error("got", writer.Code, "want 200")
+	}
 }
 
 func TestDeletePlayer(t *testing.T) {
-	// mux := http.NewServeMux()
-	// mux.HandleFunc("/players/", PlayersRouter)
-	// writer := httptest.NewRecorder()
+	mux := http.NewServeMux()
+	mux.HandleFunc("/players/", PlayersRouter)
+	writer := httptest.NewRecorder()
+
+	player := Player{Name: "DELETE Player test"}
+	err := player.Create()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tourney := FullTournament{
+		Tournament: Tournament{Name: "DELETE Player Tournament"},
+		Attendees:  []Attendee{{Player: &player, Name: "DELETE Player Attendee", Standing: 1}},
+	}
+	err = tourney.Create()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	request, _ := http.NewRequest("DELETE", "/players/"+strconv.Itoa(player.PlayerID), nil)
+	mux.ServeHTTP(writer, request)
+
+	if writer.Code != 200 {
+		t.Error("got", writer.Code, "want 200")
+	}
 }

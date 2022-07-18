@@ -289,6 +289,6 @@ func GetPlayers() (pas []PlayerAttendance, err error) {
 
 // Deleted players will remove their attendance
 func DeletePlayer(id int) (err error) {
-	_, err = DB.Exec("delete from players where playerid = %1", id)
+	_, err = DB.Exec("delete from players where playerid = $1", id)
 	return
 }
