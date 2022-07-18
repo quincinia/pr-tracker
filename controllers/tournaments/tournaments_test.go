@@ -26,6 +26,7 @@ func setUp() {
 func tearDown() {
 	DB.Exec("delete from tournaments")
 }
+
 func TestGetTournament(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/tournaments/", TournamentsRouter)

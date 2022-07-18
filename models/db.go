@@ -237,7 +237,7 @@ func GetPlayer(id int) (pa PlayerAttendance, err error) {
 		return
 	}
 
-	rows, err := DB.Query("select attendeeid, tourney, name, standing from attendees where player = $1")
+	rows, err := DB.Query("select attendeeid, tourney, name, standing from attendees where player = $1", id)
 	if err != nil {
 		return
 	}
