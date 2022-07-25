@@ -132,7 +132,14 @@ func (t *Tournament) Delete() (err error) {
 }
 
 func (a *Attendee) Create() (err error) {
-	query := "insert into attendees (tourney, player, name, standing) values ($1, $2, $3, $4) returning attendeeid"
+	// The only time Create() should be called is when a tournament is first created
+	// Prioritizing getting all the attendees in the db, even if that means removing any set players
+	// A player should not be assigned to more than 1 attendee
+	query := `
+		insert into attendees (tourney, player, name, standing) values ($1, $2, $3, $4)
+		on conflict on constraint attendees_tourney_player_key do update set player = null
+		returning attendeeid
+	`
 
 	stmt, err := DB.Prepare(query)
 	if err != nil {
@@ -164,10 +171,15 @@ func GetAttendee(attendeeid int) (a Attendee, err error) {
 
 func (a *Attendee) Update() (err error) {
 	var playerid *int
-	query := "update players set tourney = $2, player = $3, name = $4, standing = $5 where attendeeid = $1"
 	if a.Player != nil {
 		playerid = &a.Player.PlayerID
+
+		// If a player has been assigned to an existing attendee, they will be moved to the currently updated attendee
+		// A combination of (tourney, player) has to be unique (see setup.sql)
+		DB.Exec("delete from attendees where tourney = $1 and playerid = $2", a.Tourney, playerid)
 	}
+
+	query := "update attendees set tourney = $2, player = $3, name = $4, standing = $5 where attendeeid = $1"
 	_, err = DB.Exec(query, a.AttendeeID, a.Tourney, playerid, a.Name, a.Standing)
 	return
 }

@@ -40,4 +40,5 @@ create table Attendees (
     standing    int,
     foreign key (tourney) references Tournaments(tourneyid) on delete cascade,
     foreign key (player) references Players(playerid) on delete set null
+    unique (tourney, player) -- A player represents at most 1 attendee
 );
