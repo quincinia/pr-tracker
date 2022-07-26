@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -8,6 +10,8 @@ import (
 	"net/url"
 	"os"
 	"pr-tracker/requests/challonge"
+	"pr-tracker/requests/smashgg"
+	"strings"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -65,5 +69,32 @@ func main() {
 
 	case "smash.gg", "start.gg":
 		fmt.Println("smash.gg/start.gg")
+		query := smashgg.SGGQuery{
+			Query:     "query TournamentEventQuery($tournament: String, $event: String) { tournament(slug: $tournament) { name url(relative: false) } event(slug: $event) { name numEntrants entrants(query: { page: 1, perPage: 500 }) { nodes { id name standing { placement } } } sets(page: 1, perPage: 3, sortType: RECENT) { nodes { fullRoundText lPlacement } } }}",
+			Variables: make(map[string]string),
+		}
+		query.Variables["tournament"] = strings.Split(input.Path, "/")[2]
+		query.Variables["event"] = input.Path[1:]
+
+		body, _ := json.Marshal(query)
+		req, _ := http.NewRequest("POST", "https://api.smash.gg/gql/alpha", bytes.NewBuffer(body))
+		req.Header.Add("content-type", "application/json")
+		req.Header.Add("authorization", "Bearer " + SMASHGG_KEY)
+
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			fmt.Print("network error: ")
+			log.Fatalln(err)
+		}
+		defer res.Body.Close()
+
+		smashgg, err := smashgg.NewSmashgg(res.Body)
+		if err != nil {
+			fmt.Print("parse error: ")
+			log.Fatalln(err)
+		}
+
+		tournament, _ := smashgg.ToTournament()
+		fmt.Println(tournament)
 	}
 }

@@ -9,6 +9,11 @@ import (
 	"pr-tracker/requests"
 )
 
+type SGGQuery struct {
+	Query string `json:"query"`
+	Variables map[string]string `json:"variables"`
+}
+
 type Smashgg struct {
 	Data struct {
 		Tournament Tournament
