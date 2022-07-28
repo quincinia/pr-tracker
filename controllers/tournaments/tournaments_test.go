@@ -9,6 +9,8 @@ import (
 	. "pr-tracker/models"
 	"strconv"
 	"testing"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func TestMain(m *testing.M) {
@@ -28,8 +30,8 @@ func tearDown() {
 }
 
 func TestGetTournament(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/tournaments/", TournamentsRouter)
+	mux := httprouter.New()
+	AddRoutes("/tournaments", mux)
 	writer := httptest.NewRecorder()
 
 	tourney := FullTournament{
@@ -59,8 +61,8 @@ func TestGetTournament(t *testing.T) {
 }
 
 func TestGetTournaments(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/tournaments/", TournamentsRouter)
+	mux := httprouter.New()
+	AddRoutes("/tournaments", mux)
 	writer := httptest.NewRecorder()
 
 	tests := []FullTournament{
@@ -96,8 +98,8 @@ func TestGetTournaments(t *testing.T) {
 }
 
 func TestPostTournament(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/tournaments/", TournamentsRouter)
+	mux := httprouter.New()
+	AddRoutes("/tournaments", mux)
 	writer := httptest.NewRecorder()
 
 	tourney := FullTournament{
@@ -117,8 +119,8 @@ func TestPostTournament(t *testing.T) {
 }
 
 func TestDeleteTournament(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/tournaments/", TournamentsRouter)
+	mux := httprouter.New()
+	AddRoutes("/tournaments", mux)
 	writer := httptest.NewRecorder()
 
 	tourney := FullTournament{

@@ -4,53 +4,59 @@ package tournaments
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"path"
 	"pr-tracker/models"
 	"strconv"
+
+	"github.com/julienschmidt/httprouter"
 )
 
-func TournamentsRouter(w http.ResponseWriter, r *http.Request) {
-	var err error
-	// fmt.Println(r.URL.Path)
-	switch r.Method {
-	case "GET":
-		err = getTournament(w, r)
-	case "POST":
-		err = postTournament(w, r)
-	// case "PUT":
-	// 	err = handlePut(w, r)
-	case "DELETE":
-		err = deleteTournament(w, r)
-	}
-	if err != nil {
-		fmt.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+// Prefix paths should not end with "/"
+func AddRoutes(prefix string, router *httprouter.Router) {
+	router.HandlerFunc("GET", prefix+"/", getTournaments)
+	router.Handle("GET", prefix+"/:id", getTournament)
+	router.HandlerFunc("POST", prefix+"/", postTournament)
+	router.Handle("DELETE", prefix+"/:id", deleteTournament)
 }
 
-// Returns full tournament data (including attendees)
-func getTournament(w http.ResponseWriter, r *http.Request) (err error) {
-	// This may be an issue?
-	// Instead of hard-coding the route, you can pass the preferred route when it is attached to the mux?
-	if r.URL.Path == "/tournaments/" {
-		return getTournaments(w, r)
-	}
+// Deprecated, using httprouter
+// func TournamentsRouter(w http.ResponseWriter, r *http.Request) {
+// 	var err error
+// 	// fmt.Println(r.URL.Path)
+// 	switch r.Method {
+// 	case "GET":
+// 		err = getTournament(w, r)
+// 	case "POST":
+// 		err = postTournament(w, r)
+// 	// case "PUT":
+// 	// 	err = handlePut(w, r)
+// 	case "DELETE":
+// 		err = deleteTournament(w, r)
+// 	}
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 		return
+// 	}
+// }
 
-	id, err := strconv.Atoi(path.Base(r.URL.Path))
+// Returns full tournament data (including attendees)
+func getTournament(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, err := strconv.Atoi(ps.ByName("id"))
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	tournament, err := models.GetTournament(id)
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	attendees, err := models.GetAttendees(id)
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -58,68 +64,82 @@ func getTournament(w http.ResponseWriter, r *http.Request) (err error) {
 
 	output, err := json.MarshalIndent(&fulltournament, "", "\t")
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(output)
-	return
 }
 
 // Returns only the tournament data (no attendees)
-func getTournaments(w http.ResponseWriter, r *http.Request) (err error) {
+func getTournaments(w http.ResponseWriter, r *http.Request) {
 	tournaments, err := models.GetTournaments()
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	output, err := json.MarshalIndent(&tournaments, "", "\t")
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(output)
-	return
 }
 
-func postTournament(w http.ResponseWriter, r *http.Request) (err error) {
+func postTournament(w http.ResponseWriter, r *http.Request) {
+	var err error
 	len := r.ContentLength
 	body := make([]byte, len)
 	r.Body.Read(body)
+
 	var fulltournament models.FullTournament
-	json.Unmarshal(body, &fulltournament)
-	err = fulltournament.Create()
+	err = json.Unmarshal(body, &fulltournament)
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	err = fulltournament.Create()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(200)
-	return
 }
 
-func deleteTournament(w http.ResponseWriter, r *http.Request) (err error) {
-	id, err := strconv.Atoi(path.Base(r.URL.Path))
+func deleteTournament(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, err := strconv.Atoi(ps.ByName("id"))
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	tournament, err := models.GetTournament(id)
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	attendees, err := models.GetAttendees(id)
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	fulltournament := models.FullTournament{Tournament: tournament, Attendees: attendees}
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = fulltournament.Tournament.Delete()
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -130,5 +150,4 @@ func deleteTournament(w http.ResponseWriter, r *http.Request) (err error) {
 	// }
 
 	w.WriteHeader(200)
-	return
 }
