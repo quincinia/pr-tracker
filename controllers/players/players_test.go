@@ -9,6 +9,8 @@ import (
 	. "pr-tracker/models"
 	"strconv"
 	"testing"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func TestMain(m *testing.M) {
@@ -28,8 +30,8 @@ func tearDown() {
 }
 
 func TestGetPlayer(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/players/", PlayersRouter)
+	mux := httprouter.New()
+	AddRoutes("/players", mux)
 	writer := httptest.NewRecorder()
 
 	player := Player{Name: "GET Player test"}
@@ -65,8 +67,8 @@ func TestGetPlayer(t *testing.T) {
 }
 
 func TestGetPlayers(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/players/", PlayersRouter)
+	mux := httprouter.New()
+	AddRoutes("/players", mux)
 	writer := httptest.NewRecorder()
 
 	player1 := Player{Name: "X.1 Player"}
@@ -132,8 +134,8 @@ func TestGetPlayers(t *testing.T) {
 }
 
 func TestPostPlayer(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/players/", PlayersRouter)
+	mux := httprouter.New()
+	AddRoutes("/players", mux)
 	writer := httptest.NewRecorder()
 
 	player := Player{Name: "POST Player test"}
@@ -154,8 +156,8 @@ func TestPostPlayer(t *testing.T) {
 }
 
 func TestDeletePlayer(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/players/", PlayersRouter)
+	mux := httprouter.New()
+	AddRoutes("/players", mux)
 	writer := httptest.NewRecorder()
 
 	player := Player{Name: "DELETE Player test"}

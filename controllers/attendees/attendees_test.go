@@ -9,6 +9,8 @@ import (
 	. "pr-tracker/models"
 	"strconv"
 	"testing"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func TestMain(m *testing.M) {
@@ -26,8 +28,8 @@ func setUp() {
 func tearDown() {}
 
 func TestGetAttendee(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/attendees/", AttendeesRouter)
+	mux := httprouter.New()
+	AddRoutes("/attendees", mux)
 	writer := httptest.NewRecorder()
 
 	tourney := FullTournament{
@@ -54,8 +56,8 @@ func TestGetAttendee(t *testing.T) {
 }
 
 func TestPutAttendee(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/attendees/", AttendeesRouter)
+	mux := httprouter.New()
+	AddRoutes("/attendees", mux)
 	writer := httptest.NewRecorder()
 
 	player1 := Player{Name: "PUT Attendee player 1"}
