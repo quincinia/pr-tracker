@@ -4,7 +4,10 @@ package challonge
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
+	"net/http"
+	"net/url"
 	"pr-tracker/models"
 	"pr-tracker/requests"
 )
@@ -124,5 +127,34 @@ func (c *Challonge) ToTournament() (t models.Tournament, as []models.Attendee) {
 		}
 		as = append(as, a)
 	}
+	return
+}
+
+func (c *Challonge) FromURL(input *url.URL, key string) (t models.FullTournament, err error) {
+	reqURL := url.URL{
+		Scheme: "https",
+		Host:   "api.challonge.com",
+		Path:   "/v1/tournaments" + input.Path + ".json",
+	}
+	query := url.Values{}
+	query.Add("api_key", key)
+	query.Add("include_participants", "1")
+	query.Add("include_matches", "1")
+	reqURL.RawQuery = query.Encode()
+	fmt.Println(reqURL.String())
+
+	res, err := http.Get(reqURL.String())
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	challonge, err := NewChallonge(res.Body)
+	if err != nil {
+		return
+	}
+
+	t.Tournament, t.Attendees = challonge.ToTournament()
+
 	return
 }

@@ -53,15 +53,13 @@ func main() {
 
 		res, err := http.Get(reqURL.String())
 		if err != nil {
-			fmt.Print("network error: ")
-			log.Fatalln(err)
+			log.Fatalln("network error: ", err)
 		}
 		defer res.Body.Close()
 
 		challonge, err := challonge.NewChallonge(res.Body)
 		if err != nil {
-			fmt.Print("parse error: ")
-			log.Fatalln(err)
+			log.Fatalln("parse error: ", err)
 		}
 
 		tournament, _ := challonge.ToTournament()
@@ -83,15 +81,13 @@ func main() {
 
 		res, err := http.DefaultClient.Do(req)
 		if err != nil {
-			fmt.Print("network error: ")
-			log.Fatalln(err)
+			log.Fatalln("network error: ", err)
 		}
 		defer res.Body.Close()
 
 		smashgg, err := smashgg.NewSmashgg(res.Body)
 		if err != nil {
-			fmt.Print("parse error: ")
-			log.Fatalln(err)
+			log.Fatalln("parse error: ", err)
 		}
 
 		tournament, _ := smashgg.ToTournament()
