@@ -1,0 +1,28 @@
+{{ define "content" }}
+
+<table>
+    <thead>
+        <tr>
+            <th>Player</th>
+            {{ range .Tournaments }}
+                <th><a href="{{ .URL }}">{{ .Name }}</a></th>
+            {{ end }}
+        </tr>
+    </thead>
+    <tbody>
+        {{ range $player, $attendance := .Rows }}
+            <tr>
+                <td>{{ $player.Name }}</td>
+                {{ range $attendance }}
+                    <td>
+                        {{ if . }}
+                            {{ .Standing }}
+                        {{ end }}
+                    </td>
+                {{ end }}
+            </tr>
+        {{ end }}
+    </tbody>
+</table>
+
+{{ end }}

@@ -1,0 +1,35 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 40px auto;
+    max-width: 650px;
+    line-height: 1.6;
+    font-size: 18px;
+    color: #444;
+    padding: 0 10px
+}
+
+h1,
+h2,
+h3 {
+    line-height: 1.2
+}
+
+table {
+    width: 100%;
+    margin: 20px 0;
+    border-collapse: collapse;
+    line-height: 1.5em;
+    border: 2px solid;
+}
+
+table td, td {
+    border-top: 1px solid #eaeaea;
+}
+
+tr:nth-child(odd) > td {
+    background: #fcfcfc;
+}
+
+thead th, th {
+    text-align: left;
+}

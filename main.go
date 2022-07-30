@@ -8,7 +8,7 @@ import (
 	"pr-tracker/controllers/attendees"
 	"pr-tracker/controllers/players"
 	"pr-tracker/controllers/tournaments"
-
+	"pr-tracker/templates"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/julienschmidt/httprouter"
 )
@@ -36,6 +36,7 @@ func main() {
 	attendeesRouter := httprouter.New()
 	playersRouter := httprouter.New()
 	tournamentsRouter := httprouter.New()
+	fs := http.FileServer(http.Dir("./static"))
 
 	app := http.NewServeMux()
 
@@ -47,6 +48,8 @@ func main() {
 	app.Handle("/api/attendees/", attendeesRouter)
 	app.Handle("/api/players/", playersRouter)
 	app.Handle("/api/tournaments/", http.StripPrefix("/api/tournaments", tournamentsRouter))
+	app.Handle("/static/", http.StripPrefix("/static/", fs))
+	app.HandleFunc("/", templates.RenderTable)
 
 	fmt.Println("Serving on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", app))
