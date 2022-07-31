@@ -82,6 +82,8 @@ func GetTournaments() (ts []Tournament, err error) {
 		if err != nil {
 			return
 		}
+		t.Type = ntt.ToTourneyType()
+		t.Tier = nt.ToTier()
 		ts = append(ts, t)
 	}
 	rows.Close()
@@ -106,6 +108,7 @@ func GetAttendees(tourneyid int) (as []Attendee, err error) {
 		if err != nil {
 			return
 		}
+		a.Player = np.ToPlayer()
 		as = append(as, a)
 	}
 	rows.Close()
