@@ -5,6 +5,9 @@ import (
 	"html/template"
 	"net/http"
 	"pr-tracker/models"
+	"strconv"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func getPlayers() (ps []models.Player, err error) {
@@ -114,6 +117,102 @@ func RenderTable(w http.ResponseWriter, r *http.Request) {
 		Rows:        rows,
 	}
 	err = tmpl.ExecuteTemplate(w, "layout", table)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func RenderTourneySelect(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tournament_select.html"))
+	tournaments, err := models.GetTournaments()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.ExecuteTemplate(w, "layout", tournaments)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func RenderTourneyView(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	tmpl := template.Must(template.ParseFiles("./templates/layout.html", "./templates/tournament_view.html"))
+	id, err := strconv.Atoi(ps.ByName("id"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	tournament, err := models.GetTournament(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	players, err := getPlayers()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	attendees, err := models.GetAttendees(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := struct {
+		Players []models.Player
+		models.FullTournament
+	}{
+		players,
+		models.FullTournament{Tournament: tournament, Attendees: attendees},
+	}
+
+	err = tmpl.ExecuteTemplate(w, "layout", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func RenderPlayerView(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	tmpl := template.Must(template.ParseFiles("./templates/layout.html", "./templates/player_view.html"))
+	id, err := strconv.Atoi(ps.ByName("id"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	tournaments, err := models.GetTournaments()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	player, err := models.GetPlayer(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	tmap := make(map[int]models.Tournament)
+	for _, t := range tournaments {
+		tmap[t.TourneyID] = t
+	}
+
+	data := struct {
+		Tmap map[int]models.Tournament
+		models.PlayerAttendance
+	}{
+		tmap,
+		player,
+	}
+
+	err = tmpl.ExecuteTemplate(w, "layout", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

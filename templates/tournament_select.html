@@ -1,0 +1,16 @@
+{{ define "content" }}
+
+<h2>Add Tournament</h2>
+<form action="/tournaments/new" method="post">
+    <input type="text" name="newtourney" id="newtourney" placeholder="Paste tourney link..." />
+    <button>Add Tourney</button>
+</form>
+<hr />
+<h2>Current Tournaments</h2>
+<div>Tournament Name (Tier)</div>
+{{/* Expects []models.Tournament */}}
+{{ range . }}
+<div><a href="/tournaments/{{ .TourneyID }}">{{ .Name }} ({{ if .Tier }}.Tier.Name{{ else }}-{{ end }})</a></div>
+{{ end }}
+
+{{ end }}

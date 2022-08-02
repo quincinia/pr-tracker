@@ -1,0 +1,55 @@
+{{ define "content" }}
+
+<h2>{{ .Name }}</h2>
+<a href="{{ .URL }}">{{ .URL }}</a>
+<form action="">
+    <label for="tier">Tier: </label>
+    <select name="tier" id="tier">
+        <option value="nil"></option>
+        <option value="C">C</option>
+        <option value="B">B</option>
+        <option value="A">A</option>
+        <option value="S">S</option>
+    </select>
+    <button>Change Tier</button>
+</form>
+
+<form action="">
+    <table>
+        <thead>
+            <tr>
+                <th>Entrant Name</th>
+                <th>Player Name</th>
+                <th>Standing</th>
+                <th><button>Save Changes</button></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ $players := .Players }}
+            {{ range $attendee := .Attendees }}
+            <tr>
+                <td>
+                    {{ .Name }}
+                </td>
+                <td>
+                    <select name="{{ .AttendeeID }}">
+                        <option value="nil"></option>
+                        {{ range $players }}
+                        <option value="{{ .PlayerID }}" 
+                            {{ if and $attendee.Player (eq $attendee.Player.PlayerID .PlayerID) }}
+                                selected 
+                            {{ end }}>{{ .Name }}
+                        </option>
+                        {{ end }}
+                    </select>
+                </td>
+                <td>
+                    {{ .Standing }}
+                </td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</form>
+
+{{ end }}

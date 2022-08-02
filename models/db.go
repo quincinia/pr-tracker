@@ -97,7 +97,8 @@ func GetAttendees(tourneyid int) (as []Attendee, err error) {
 		select attendeeid, tourney, player, players.name, attendees.name, standing
 		from attendees
 		left outer join players on player = playerid
-	`)
+		where tourney = $1
+	`, tourneyid)
 	if err != nil {
 		return
 	}

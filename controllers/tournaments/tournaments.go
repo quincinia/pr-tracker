@@ -132,10 +132,6 @@ func deleteTournament(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	}
 
 	fulltournament := models.FullTournament{Tournament: tournament, Attendees: attendees}
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 
 	err = fulltournament.Tournament.Delete()
 	if err != nil {

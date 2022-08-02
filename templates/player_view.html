@@ -1,0 +1,25 @@
+{{ define "content" }}
+
+<h2>{{ .Name }}</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Tournament</th>
+            <th>Entrant Tag</th>
+            <th>Placement</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ $tmap := .Tmap }}
+        {{ range .Attendance }}
+        <tr>
+            {{ $tourney := index $tmap .Tourney }}
+            <td><a href="{{ $tourney.URL }}">{{ $tourney.Name }}</a></td>
+            <td>{{ .Name }}</td>
+            <td>{{ .Standing }}</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+
+{{ end }}

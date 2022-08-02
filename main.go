@@ -9,6 +9,7 @@ import (
 	"pr-tracker/controllers/players"
 	"pr-tracker/controllers/tournaments"
 	"pr-tracker/templates"
+
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/julienschmidt/httprouter"
 )
@@ -43,13 +44,20 @@ func main() {
 	attendees.AddRoutes("/api/attendees", attendeesRouter)
 	players.AddRoutes("/api/players", playersRouter)
 	tournaments.AddRoutes("", tournamentsRouter)
-	
+
 	// http.StripPrefix can also work here if you wish to reuse the same handler on different routes
 	app.Handle("/api/attendees/", attendeesRouter)
 	app.Handle("/api/players/", playersRouter)
 	app.Handle("/api/tournaments/", http.StripPrefix("/api/tournaments", tournamentsRouter))
 	app.Handle("/static/", http.StripPrefix("/static/", fs))
-	app.HandleFunc("/", templates.RenderTable)
+
+	site := httprouter.New()
+	site.HandlerFunc("GET", "/", templates.RenderTable)
+	site.HandlerFunc("GET", "/tournaments/", templates.RenderTourneySelect)
+	site.GET("/tournaments/:id", templates.RenderTourneyView)
+	site.GET("/players/:id", templates.RenderPlayerView)
+
+	app.Handle("/", site)
 
 	fmt.Println("Serving on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", app))
