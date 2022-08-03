@@ -55,6 +55,7 @@ func main() {
 	site.HandlerFunc("GET", "/", templates.RenderTable)
 	site.HandlerFunc("GET", "/tournaments/", templates.RenderTourneySelect)
 	site.GET("/tournaments/:id", templates.RenderTourneyView)
+	site.HandlerFunc("GET", "/players/", templates.RenderPlayerSelect)
 	site.GET("/players/:id", templates.RenderPlayerView)
 
 	app.Handle("/", site)

@@ -1,0 +1,14 @@
+{{ define "content" }}
+
+<h2>Add Player</h2>
+<form action="/players/new" method="post">
+    <input type="text" name="newplayer" id="newplayer" placeholder="Enter playertag..." />
+    <button>Add Player</button>
+</form>
+<hr />
+<h2>Current Players</h2>
+{{ range . }}
+<div><a href="/players/{{ .PlayerID }}">{{ .Name }}</a></div>
+{{ end }}
+
+{{ end }}

@@ -179,6 +179,21 @@ func RenderTourneyView(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	}
 }
 
+func RenderPlayerSelect(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("./templates/layout.html", "./templates/player_select.html"))
+	players, err := getPlayers()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.ExecuteTemplate(w, "layout", players)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func RenderPlayerView(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	tmpl := template.Must(template.ParseFiles("./templates/layout.html", "./templates/player_view.html"))
 	id, err := strconv.Atoi(ps.ByName("id"))
