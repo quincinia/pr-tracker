@@ -164,12 +164,16 @@ func RenderTourneyView(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		return
 	}
 
+	tiers := []string{"", "C", "B", "A", "S"}
+
 	data := struct {
 		Players []models.Player
 		models.FullTournament
+		Tiers []string
 	}{
 		players,
 		models.FullTournament{Tournament: tournament, Attendees: attendees},
+		tiers,
 	}
 
 	err = tmpl.ExecuteTemplate(w, "layout", data)

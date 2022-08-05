@@ -5,16 +5,19 @@
 <form action="">
     <label for="tier">Tier: </label>
     <select name="tier" id="tier">
-        <option value="nil"></option>
-        <option value="C">C</option>
-        <option value="B">B</option>
-        <option value="A">A</option>
-        <option value="S">S</option>
+        {{ $tier := .Tier }}
+        {{ range .Tiers }}
+        <option value="{{ . }}"
+            {{ if and $tier (eq $tier.Name .) }}
+                selected
+            {{ end }}
+        >{{ . }}</option>
+        {{ end }}
     </select>
     <button>Change Tier</button>
 </form>
 
-<form action="">
+<form action="/tournaments/{{ .TourneyID }}/edit" method="post">
     <table>
         <thead>
             <tr>
@@ -33,7 +36,7 @@
                 </td>
                 <td>
                     <select name="{{ .AttendeeID }}">
-                        <option value="nil"></option>
+                        <option value=""></option>
                         {{ range $players }}
                         <option value="{{ .PlayerID }}" 
                             {{ if and $attendee.Player (eq $attendee.Player.PlayerID .PlayerID) }}

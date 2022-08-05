@@ -58,6 +58,8 @@ func main() {
 	site.HandlerFunc("GET", "/players/", templates.RenderPlayerSelect)
 	site.GET("/players/:id", templates.RenderPlayerView)
 
+	site.POST("/tournaments/:id/edit", tournaments.ProcessTourneyAttendees)
+	
 	app.Handle("/", site)
 
 	fmt.Println("Serving on http://localhost:8080")
