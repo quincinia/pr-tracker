@@ -10,7 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func ProcessTourneyAttendees(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func ProcessTourneyEdit(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id, err := strconv.Atoi(ps.ByName("id"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
