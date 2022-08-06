@@ -10,7 +10,7 @@
 <div>Tournament Name (Tier)</div>
 {{/* Expects []models.Tournament */}}
 {{ range . }}
-<div><a href="/tournaments/{{ .TourneyID }}">{{ .Name }} ({{ if .Tier }}.Tier.Name{{ else }}-{{ end }})</a></div>
+<div><a href="/tournaments/{{ .TourneyID }}">{{ .Name }} ({{ if .Tier }}{{ .Tier.Name }}{{ else }}-{{ end }})</a></div>
 {{ end }}
 
 {{ end }}

@@ -2,29 +2,27 @@
 
 <h2>{{ .Name }}</h2>
 <a href="{{ .URL }}">{{ .URL }}</a>
-<form action="">
-    <label for="tier">Tier: </label>
-    <select name="tier" id="tier">
-        {{ $tier := .Tier }}
-        {{ range .Tiers }}
-        <option value="{{ . }}"
-            {{ if and $tier (eq $tier.Name .) }}
-                selected
-            {{ end }}
-        >{{ . }}</option>
-        {{ end }}
-    </select>
-    <button>Change Tier</button>
-</form>
-
 <form action="/tournaments/{{ .TourneyID }}/edit" method="post">
+    <button>Save Changes</button>
+    <div>
+        <label for="tier">Tier: </label>
+        <select name="tier" id="tier">
+            {{ $tier := .Tier }}
+            {{ range .Tiers }}
+            <option value="{{ . }}"
+                {{ if and $tier (eq $tier.Name .) }}
+                    selected
+                {{ end }}
+            >{{ . }}</option>
+            {{ end }}
+        </select>
+    </div>
     <table>
         <thead>
             <tr>
                 <th>Entrant Name</th>
                 <th>Player Name</th>
                 <th>Standing</th>
-                <th><button>Save Changes</button></th>
             </tr>
         </thead>
         <tbody>

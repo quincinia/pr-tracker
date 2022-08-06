@@ -17,6 +17,28 @@ func ProcessTourneyAttendees(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
+	tournament, err := models.GetTournament(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	tier := r.FormValue("tier")
+	switch tier {
+	case "C":
+		tournament.Tier = models.C_TIER
+	case "B":
+		tournament.Tier = models.B_TIER
+	case "A":
+		tournament.Tier = models.A_TIER
+	case "S":
+		tournament.Tier = models.S_TIER
+	default:
+		tournament.Tier = nil
+	}
+
+	tournament.Update()
+
 	attendees, err := models.GetAttendees(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -45,6 +67,6 @@ func ProcessTourneyAttendees(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// Expects urls of the form: /tournaments/:tourneyid/edit
-	// Not performing validation right now
+	// Not performing url validation right now
 	http.Redirect(w, r, strings.TrimSuffix(r.URL.String(), "/edit"), http.StatusFound)
 }
