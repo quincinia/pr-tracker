@@ -63,8 +63,8 @@ func main() {
 	site.HandlerFunc("GET", "/players/", templates.RenderPlayerSelect)
 	site.GET("/players/:id", templates.RenderPlayerView)
 
-	site.POST("/tournaments/:id/edit", tournaments.ProcessTourneyEdit)
-	site.HandlerFunc("POST", "/tournaments/new", withContext(keyctx, http.HandlerFunc(tournaments.ProcessTourneyAdd)))
+	site.POST("/tournaments/edit/:id", tournaments.ProcessTourneyEdit)
+	site.HandlerFunc("POST", "/tournaments/new", withContext(keyctx, tournaments.ProcessTourneyAdd))
 
 	app.Handle("/", site)
 
@@ -72,7 +72,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", app))
 }
 
-func withContext(ctx context.Context, h http.Handler) http.HandlerFunc {
+func withContext(ctx context.Context, h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if ctx == nil {
 			h.ServeHTTP(w, r)

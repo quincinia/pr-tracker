@@ -70,9 +70,9 @@ func ProcessTourneyEdit(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		attendees[i].Update()
 	}
 
-	// Expects urls of the form: /tournaments/:tourneyid/edit
+	// Expects urls of the form: /tournaments/edit/:tourneyid
 	// Not performing url validation right now
-	http.Redirect(w, r, strings.TrimSuffix(r.URL.String(), "/edit"), http.StatusFound)
+	http.Redirect(w, r, strings.Replace(r.URL.String(), "/edit", "", 1), http.StatusFound)
 }
 
 func ProcessTourneyAdd(w http.ResponseWriter, r *http.Request) {
@@ -104,5 +104,5 @@ func ProcessTourneyAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, strings.TrimSuffix(r.URL.String(), "/new")+strconv.Itoa(tournament.TourneyID), http.StatusFound)
+	http.Redirect(w, r, strings.TrimSuffix(r.URL.String(), "new")+strconv.Itoa(tournament.TourneyID), http.StatusFound)
 }
