@@ -2,7 +2,7 @@
 
 <h2>{{ .Name }}</h2>
 <a href="{{ .URL }}">{{ .URL }}</a>
-<form action="/tournaments/{{ .TourneyID }}/edit" method="post">
+<form action="/tournaments/edit/{{ .TourneyID }}" method="post">
     <button>Save Changes</button>
     <div>
         <label for="tier">Tier: </label>
