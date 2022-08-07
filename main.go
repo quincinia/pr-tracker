@@ -64,7 +64,7 @@ func main() {
 	site.GET("/players/:id", templates.RenderPlayerView)
 
 	site.POST("/tournaments/edit/:id", tournaments.ProcessTourneyEdit)
-	site.HandlerFunc("POST", "/tournaments/new", withContext(keyctx, tournaments.ProcessTourneyAdd))
+	site.HandlerFunc("POST", "/tournaments/new", withContext(keyctx, http.HandlerFunc(tournaments.ProcessTourneyAdd)))
 
 	app.Handle("/", site)
 
