@@ -111,7 +111,7 @@ func (s *Smashgg) ToTournament() (t models.Tournament, as []models.Attendee) {
 	return
 }
 
-func (s *Smashgg) FromURL(url *url.URL, key string) (t models.FullTournament, err error) {
+func FromURL(url *url.URL, key string) (t models.FullTournament, err error) {
 	query := SGGQuery{
 		Query:     "query TournamentEventQuery($tournament: String, $event: String) { tournament(slug: $tournament) { name url(relative: false) } event(slug: $event) { name numEntrants entrants(query: { page: 1, perPage: 500 }) { nodes { id name standing { placement } } } sets(page: 1, perPage: 3, sortType: RECENT) { nodes { fullRoundText lPlacement } } }}",
 		Variables: make(map[string]string),

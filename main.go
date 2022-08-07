@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -34,6 +35,10 @@ func main() {
 	// 	log.Fatalln(err)
 	// }
 
+	keyctx := context.Background()
+	keyctx = context.WithValue(keyctx, "smashgg_key", SMASHGG_KEY)
+	keyctx = context.WithValue(keyctx, "challonge_key", CHALLONGE_KEY)
+
 	attendeesRouter := httprouter.New()
 	playersRouter := httprouter.New()
 	tournamentsRouter := httprouter.New()
@@ -59,9 +64,19 @@ func main() {
 	site.GET("/players/:id", templates.RenderPlayerView)
 
 	site.POST("/tournaments/:id/edit", tournaments.ProcessTourneyEdit)
+	site.HandlerFunc("POST", "/tournaments/new", withContext(keyctx, http.HandlerFunc(tournaments.ProcessTourneyAdd)))
 
 	app.Handle("/", site)
 
 	fmt.Println("Serving on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", app))
+}
+
+func withContext(ctx context.Context, h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if ctx == nil {
+			h.ServeHTTP(w, r)
+		}
+		h.ServeHTTP(w, r.Clone(ctx))
+	}
 }

@@ -130,7 +130,7 @@ func (c *Challonge) ToTournament() (t models.Tournament, as []models.Attendee) {
 	return
 }
 
-func (c *Challonge) FromURL(input *url.URL, key string) (t models.FullTournament, err error) {
+func FromURL(input *url.URL, key string) (t models.FullTournament, err error) {
 	reqURL := url.URL{
 		Scheme: "https",
 		Host:   "api.challonge.com",

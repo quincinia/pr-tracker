@@ -2,8 +2,12 @@
 package tournaments
 
 import (
+	"errors"
 	"net/http"
+	"net/url"
 	"pr-tracker/models"
+	"pr-tracker/requests/challonge"
+	"pr-tracker/requests/smashgg"
 	"strconv"
 	"strings"
 
@@ -69,4 +73,36 @@ func ProcessTourneyEdit(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	// Expects urls of the form: /tournaments/:tourneyid/edit
 	// Not performing url validation right now
 	http.Redirect(w, r, strings.TrimSuffix(r.URL.String(), "/edit"), http.StatusFound)
+}
+
+func ProcessTourneyAdd(w http.ResponseWriter, r *http.Request) {
+	input, err := url.Parse(r.FormValue("newtourney"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	ctx := r.Context()
+	var tournament models.FullTournament
+
+	switch input.Host {
+	case "challonge.com":
+		tournament, err = challonge.FromURL(input, ctx.Value("challonge_key").(string))
+	case "smash.gg", "start.gg":
+		tournament, err = smashgg.FromURL(input, ctx.Value("smashgg_key").(string))
+	default:
+		err = errors.New("unknown host")
+	}
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = tournament.Create()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, strings.TrimSuffix(r.URL.String(), "/new")+strconv.Itoa(tournament.TourneyID), http.StatusFound)
 }
