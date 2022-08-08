@@ -29,11 +29,13 @@ func CalculatePlacings(numEntrants int) (placings int) {
 
 	exp, value := TruncLog2(numEntrants)
 	placings = 2*exp
-	if numEntrants <= (3*value)/2 {
-		placings = placings + 1
-	}
-	if numEntrants > (3*value)/2 {
-		placings = placings + 2
+	switch {
+	case numEntrants == value:
+		return placings
+	case numEntrants < (3*value)/2:
+		return placings + 1
+	case numEntrants > (3*value)/2:
+		return placings + 2
 	}
 	return
 }

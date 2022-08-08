@@ -112,9 +112,11 @@ func RenderTable(w http.ResponseWriter, r *http.Request) {
 	table := struct {
 		Tournaments []models.Tournament
 		Rows        map[models.Player][]*models.Attendee
+		Tmap        map[int]int
 	}{
 		Tournaments: tournaments,
 		Rows:        rows,
+		Tmap:        tmap,
 	}
 	err = tmpl.ExecuteTemplate(w, "layout", table)
 	if err != nil {

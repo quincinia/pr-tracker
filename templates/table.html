@@ -5,18 +5,23 @@
         <tr>
             <th>Player</th>
             {{ range .Tournaments }}
-                <th><a href="{{ .URL }}">{{ .Name }}</a></th>
+                <th><a href="/tournaments/{{ .TourneyID }}">{{ .Name }}</a></th>
             {{ end }}
         </tr>
     </thead>
     <tbody>
+        {{ $tmap := .Tmap }}
+        {{ $tournaments := .Tournaments }}
         {{ range $player, $attendance := .Rows }}
             <tr>
-                <td>{{ $player.Name }}</td>
+                <td><a href="/players/{{ $player.PlayerID }}">{{ $player.Name }}</a></td>
                 {{ range $attendance }}
                     <td>
                         {{ if . }}
-                            {{ .Standing }}
+                            {{ $tindex := index $tmap .Tourney }}
+                            {{ $tourney := index $tournaments $tindex }}
+                            {{ $tourney.PointsFromPlacement .Standing }}
+                            ({{ .Standing }})
                         {{ end }}
                     </td>
                 {{ end }}
