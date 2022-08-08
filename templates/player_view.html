@@ -10,10 +10,9 @@
         </tr>
     </thead>
     <tbody>
-        {{ $tmap := .Tmap }}
         {{ range .Attendance }}
         <tr>
-            {{ $tourney := index $tmap .Tourney }}
+            {{ $tourney := index $.Tmap .Tourney }}
             <td><a href="{{ $tourney.URL }}">{{ $tourney.Name }}</a></td>
             <td>{{ .Name }}</td>
             <td>{{ .Standing }}</td>

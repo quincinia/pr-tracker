@@ -27,7 +27,6 @@
             </tr>
         </thead>
         <tbody>
-            {{ $players := .Players }}
             {{ range $attendee := .Attendees }}
             <tr>
                 <td>
@@ -36,7 +35,7 @@
                 <td>
                     <select name="{{ .AttendeeID }}">
                         <option value=""></option>
-                        {{ range $players }}
+                        {{ range $.Players }}
                         <option value="{{ .PlayerID }}" 
                             {{ if and $attendee.Player (eq $attendee.Player.PlayerID .PlayerID) }}
                                 selected 
