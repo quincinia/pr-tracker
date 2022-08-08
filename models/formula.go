@@ -1,17 +1,44 @@
 // formula defines methods for calculating the point distribution among a tournament's attendees
 package models
 
+import "pr-tracker/requests"
+
+var (
+	up_bonus    int = 5
+	att_bonus   int = 10
+	first_bonus int = 10
+	br_bonus    int = 5
+)
+
+// For one-off calculations where you don't need to calculate the point distribution for all attendees
+func (t *Tournament) PointsFromPlacement(placement int) (points int) {
+	index := placementIndex(placement)
+	if index+1 > t.UniquePlacings {
+		return -1
+	}
+
+	points += up_bonus * (t.UniquePlacings - 1 - index)
+	points += att_bonus
+
+	if placement == 1 {
+		points += first_bonus
+	}
+
+	if placement == 2 && t.BracketReset {
+		points += br_bonus
+	}
+
+	if t.Tier != nil {
+		points *= t.Tier.Multiplier
+	}
+
+	return
+}
+
 // Generates a mapping from a player's final placement to the points that placement earns
 func (t *Tournament) PointMap() (pm map[int]int) {
 	placings := placingsList(t.UniquePlacings)
 	pm = make(map[int]int)
-
-	var (
-		up_bonus    int = 5
-		att_bonus   int = 10
-		first_bonus int = 10
-		br_bonus    int = 5
-	)
 
 	for i, p := range placings {
 		// Each unique placement earns you 5 points (unless you got last)
@@ -84,4 +111,29 @@ func placingsList(up int) (list []int) {
 	}
 
 	return
+}
+
+// Returns the number of placements that are "ahead" of the given one
+// Can also be thought of as the placement's "index" in the placement list (see above)
+// If the placement is invalid, then returns -1
+func placementIndex(placement int) (index int) {
+	if placement < 1 {
+		return -1
+	}
+
+	if placement <= 4 {
+		return placement - 1
+	}
+
+	exp, value := requests.TruncLog2(placement)
+
+	if placement == value+1 {
+		return 2 * exp
+	}
+
+	if placement == (3*value/2)+1 {
+		return 2*exp + 1
+	}
+
+	return -1
 }
