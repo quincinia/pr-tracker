@@ -23,6 +23,7 @@
                 <th>Entrant Name</th>
                 <th>Player Name</th>
                 <th>Standing</th>
+                <th>Points</th>
             </tr>
         </thead>
         <tbody>
@@ -47,6 +48,7 @@
                 <td>
                     {{ .Standing }}
                 </td>
+                <td>{{ index $.PointMap .Standing }}</td>
             </tr>
             {{ end }}
         </tbody>

@@ -171,11 +171,13 @@ func RenderTourneyView(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	data := struct {
 		Players []models.Player
 		models.FullTournament
-		Tiers []string
+		Tiers    []string
+		PointMap map[int]int
 	}{
 		players,
 		models.FullTournament{Tournament: tournament, Attendees: attendees},
 		tiers,
+		tournament.PointMap(),
 	}
 
 	err = tmpl.ExecuteTemplate(w, "layout", data)
