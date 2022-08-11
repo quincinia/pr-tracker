@@ -66,7 +66,13 @@ func RenderTable(w http.ResponseWriter, r *http.Request) {
 		// The attendance record is nil if the player did not attend that tournament
 		rows map[models.Player][]*models.Attendee
 	)
-	tmpl = template.Must(template.ParseFiles("./templates/layout.html", "./templates/table.html"))
+	add := template.FuncMap{
+		"add": func(a, b int) int {
+			return a + b
+		},
+	}
+	tmpl = template.New("layout").Funcs(add)
+	tmpl = template.Must(tmpl.ParseFiles("./templates/layout.html", "./templates/table.html"))
 	tmap = make(map[int]int)
 	pmap = make(map[int]int)
 	rows = make(map[models.Player][]*models.Attendee)

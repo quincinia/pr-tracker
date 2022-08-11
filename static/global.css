@@ -23,7 +23,9 @@ table {
 }
 
 table td, td {
+    padding: 0.75rem;
     border-top: 1px solid #eaeaea;
+    background: white;
 }
 
 tr:nth-child(odd) > td {
@@ -31,5 +33,8 @@ tr:nth-child(odd) > td {
 }
 
 thead th, th {
+    padding: 0.75rem;
     text-align: left;
+    white-space: nowrap;
+    background: white;
 }

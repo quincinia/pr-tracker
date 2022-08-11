@@ -1,31 +1,38 @@
 {{ define "content" }}
 
-<table>
-    <thead>
-        <tr>
-            <th>Player</th>
-            {{ range .Tournaments }}
-                <th><a href="/tournaments/{{ .TourneyID }}">{{ .Name }}</a></th>
-            {{ end }}
-        </tr>
-    </thead>
-    <tbody>
-        {{ range $player, $attendance := .Rows }}
+<div style="overflow-x: auto;">
+    <table>
+        <thead>
             <tr>
-                <td><a href="/players/{{ $player.PlayerID }}">{{ $player.Name }}</a></td>
-                {{ range $attendance }}
-                    <td>
-                        {{ if . }}
-                            {{ $tindex := index $.Tmap .Tourney }}
-                            {{ $tourney := index $.Tournaments $tindex }}
-                            {{ $tourney.PointsFromPlacement .Standing }}
-                            ({{ .Standing }})
-                        {{ end }}
-                    </td>
+                <th style="position: sticky; left: 0;">Player</th>
+                {{ range .Tournaments }}
+                    <th><a href="/tournaments/{{ .TourneyID }}">{{ .Name }}</a></th>
                 {{ end }}
+                <th>Total</th>
             </tr>
-        {{ end }}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {{ range $player, $attendance := .Rows }}
+                <tr>
+                    <td style="position: sticky; left: 0;"><a href="/players/{{ $player.PlayerID }}">{{ $player.Name }}</a></td>
+                    {{ $total := 0 }}
+                    {{ range $attendance }}
+                        <td>
+                            {{ if . }}
+                                {{ $tindex := index $.Tmap .Tourney }}
+                                {{ $tourney := index $.Tournaments $tindex }}
+                                {{ $points := $tourney.PointsFromPlacement .Standing }}
+                                {{ $total = add $total $points }}
+                                {{ $points }}
+                                ({{ .Standing }})
+                            {{ end }}
+                        </td>
+                    {{ end }}
+                    <td>{{ $total }}</td>
+                </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div>
 
 {{ end }}
