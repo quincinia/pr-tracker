@@ -12,9 +12,10 @@ import (
 var DB *sql.DB
 
 // Do this in main instead
-func init() {
+func Connect(username, password string) {
 	var err error
-	DB, err = sql.Open("postgres", "user=jacob dbname=pr_tracker password=test sslmode=disable")
+	connString := fmt.Sprintf("user=%s password=%s dbname=pr_tracker sslmode=disable", username, password)
+	DB, err = sql.Open("postgres", connString)
 	if err != nil {
 		panic(err)
 	}

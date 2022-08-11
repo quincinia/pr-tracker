@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/joho/godotenv"
 )
 
 func TestMain(m *testing.M) {
@@ -15,11 +17,13 @@ func TestMain(m *testing.M) {
 
 func setUp() {
 	// Database connection is made using init()
-	DB.Exec("delete from tournaments")
+	godotenv.Load("../.env")
+	Connect(os.Getenv("DB_USERNAME"), os.Getenv("DB_PASSWORD"))
+	DB.Exec("delete from tournaments where url = ''")
 }
 
 func tearDown() {
-	DB.Exec("delete from tournaments")
+	DB.Exec("delete from tournaments where url = ''")
 }
 
 func TestTournament(t *testing.T) {

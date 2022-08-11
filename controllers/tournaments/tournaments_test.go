@@ -10,23 +10,25 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 )
 
 func TestMain(m *testing.M) {
 	setUp()
 	code := m.Run()
-	// tearDown()
+	tearDown()
 	os.Exit(code)
 }
 
 func setUp() {
-	// Database connection is made using init()
-	DB.Exec("delete from tournaments")
+	godotenv.Load("../../.env")
+	Connect(os.Getenv("DB_USERNAME"), os.Getenv("DB_PASSWORD"))
+	DB.Exec("delete from tournaments where url = ''")
 }
 
 func tearDown() {
-	DB.Exec("delete from tournaments")
+	DB.Exec("delete from tournaments where url = ''")
 }
 
 func TestGetTournament(t *testing.T) {

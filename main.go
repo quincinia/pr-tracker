@@ -9,6 +9,7 @@ import (
 	"pr-tracker/controllers/attendees"
 	"pr-tracker/controllers/players"
 	"pr-tracker/controllers/tournaments"
+	"pr-tracker/models"
 	"pr-tracker/templates"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -23,17 +24,7 @@ var (
 )
 
 func main() {
-	// fmt.Printf("%v %T\n", SMASHGG_KEY, SMASHGG_KEY)
-	// fmt.Printf("%v %T\n", CHALLONGE_KEY, CHALLONGE_KEY)
-	// fmt.Printf("%v %T\n", DB_USERNAME, DB_USERNAME)
-	// fmt.Printf("%v %T\n", DB_PASSWORD, DB_PASSWORD)
-
-	// flag.Parse()
-	// args := flag.Args()
-	// input, err := url.Parse(args[0])
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
+	models.Connect(DB_USERNAME, DB_PASSWORD)
 
 	keyctx := context.Background()
 	keyctx = context.WithValue(keyctx, "smashgg_key", SMASHGG_KEY)
